@@ -14,87 +14,99 @@ import {
   linkSalesChannelsToStockLocationWorkflow,
   updateStoresWorkflow,
   uploadFilesWorkflow,
-} from '@medusajs/medusa/core-flows';
+} from '@medusajs/medusa/core-flows'
 import {
   ExecArgs,
   IFulfillmentModuleService,
   ISalesChannelModuleService,
   IStoreModuleService,
-} from '@medusajs/framework/types';
+} from '@medusajs/framework/types'
 import {
   ContainerRegistrationKeys,
   Modules,
   ProductStatus,
-} from '@medusajs/framework/utils';
-import type FashionModuleService from 'src/modules/fashion/service';
-import type { MaterialModelType } from 'src/modules/fashion/models/material';
+} from '@medusajs/framework/utils'
+import type HairPropsModuleService from 'src/modules/hair-props/service'
+import type {
+  MaterialModelType,
+  ProductLengthModelType,
+} from 'src/modules/hair-props/models/product-length'
 
 async function getImageUrlContent(url: string) {
-  const response = await fetch(url);
+  const response = await fetch(url)
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch image "${url}": ${response.statusText}`);
+    throw new Error(`Failed to fetch image "${url}": ${response.statusText}`)
   }
 
-  const arrayBuffer = await response.arrayBuffer();
+  const arrayBuffer = await response.arrayBuffer()
 
-  return Buffer.from(arrayBuffer).toString('binary');
+  return Buffer.from(arrayBuffer).toString('binary')
 }
 
 export default async function seedDemoData({ container }: ExecArgs) {
-  const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
-  const remoteLink = container.resolve(ContainerRegistrationKeys.LINK);
+  const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
+  const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
   const fulfillmentModuleService: IFulfillmentModuleService = container.resolve(
-    Modules.FULFILLMENT,
-  );
+    Modules.FULFILLMENT
+  )
   const salesChannelModuleService: ISalesChannelModuleService =
-    container.resolve(Modules.SALES_CHANNEL);
+    container.resolve(Modules.SALES_CHANNEL)
   const storeModuleService: IStoreModuleService = container.resolve(
-    Modules.STORE,
-  );
-  const fashionModuleService: FashionModuleService = container.resolve(
-    'fashionModuleService',
-  );
+    Modules.STORE
+  )
+  const hairPropsModuleService: HairPropsModuleService = container.resolve(
+    'hairPropsModuleService'
+  )
 
-  const countries = ['hr', 'gb', 'de', 'dk', 'se', 'fr', 'es', 'it'];
+  const countries = ['za', 'bw', 'zm', 'mz', 'nm', 'ke', 'ug', 'rw']
 
-  logger.info('Seeding store data...');
-  const [store] = await storeModuleService.listStores();
+  logger.info('Seeding store data...')
+  const [store] = await storeModuleService.listStores()
   let defaultSalesChannel = await salesChannelModuleService.listSalesChannels({
     name: 'Default Sales Channel',
-  });
+  })
 
   if (!defaultSalesChannel.length) {
     // create the default sales channel
     const { result: salesChannelResult } = await createSalesChannelsWorkflow(
-      container,
+      container
     ).run({
       input: {
         salesChannelsData: [
           {
-            name: 'Default Sales Channel',
+            name: 'Online',
+          },
+          {
+            name: 'In store',
           },
         ],
       },
-    });
-    defaultSalesChannel = salesChannelResult;
+    })
+    defaultSalesChannel = salesChannelResult
   }
 
-  logger.info('Seeding region data...');
+  logger.info('Seeding region data...')
   const { result: regionResult } = await createRegionsWorkflow(container).run({
     input: {
       regions: [
         {
-          name: 'Europe',
-          currency_code: 'eur',
+          name: 'South Africa',
+          currency_code: 'zar',
           countries,
-          payment_providers: ['pp_stripe_stripe'],
+          payment_providers: ['pp_paystack_paystack'],
+        },
+        {
+          name: 'South Africa',
+          currency_code: 'zar',
+          countries,
+          payment_providers: ['pp_paystack_paystack'],
         },
       ],
     },
-  });
-  const region = regionResult[0];
-  logger.info('Finished seeding regions.');
+  })
+  const region = regionResult[0]
+  logger.info('Finished seeding regions.')
 
   await updateStoresWorkflow(container).run({
     input: {
@@ -102,7 +114,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
       update: {
         supported_currencies: [
           {
-            currency_code: 'eur',
+            currency_code: 'zar',
             is_default: true,
           },
           {
@@ -113,34 +125,34 @@ export default async function seedDemoData({ container }: ExecArgs) {
         default_region_id: region.id,
       },
     },
-  });
+  })
 
-  logger.info('Seeding tax regions...');
+  logger.info('Seeding tax regions...')
   await createTaxRegionsWorkflow(container).run({
     input: countries.map((country_code) => ({
       country_code,
     })),
-  });
-  logger.info('Finished seeding tax regions.');
+  })
+  logger.info('Finished seeding tax regions.')
 
-  logger.info('Seeding stock location data...');
+  logger.info('Seeding stock location data...')
   const { result: stockLocationResult } = await createStockLocationsWorkflow(
-    container,
+    container
   ).run({
     input: {
       locations: [
         {
-          name: 'European Warehouse',
+          name: 'Johannesburg',
           address: {
-            city: 'Copenhagen',
-            country_code: 'DK',
+            city: 'Johannesburg',
+            country_code: 'ZA',
             address_1: '',
           },
         },
       ],
     },
-  });
-  const stockLocation = stockLocationResult[0];
+  })
+  const stockLocation = stockLocationResult[0]
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
@@ -149,65 +161,65 @@ export default async function seedDemoData({ container }: ExecArgs) {
     [Modules.FULFILLMENT]: {
       fulfillment_provider_id: 'manual_manual',
     },
-  });
+  })
 
-  logger.info('Seeding fulfillment data...');
+  logger.info('Seeding fulfillment data...')
   const { result: shippingProfileResult } =
     await createShippingProfilesWorkflow(container).run({
       input: {
         data: [
           {
-            name: 'Default',
+            name: 'Postnet',
             type: 'default',
           },
         ],
       },
-    });
-  const shippingProfile = shippingProfileResult[0];
+    })
+  const shippingProfile = shippingProfileResult[0]
 
   const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
     name: 'European Warehouse delivery',
     type: 'shipping',
     service_zones: [
       {
-        name: 'Europe',
+        name: 'South Africa',
         geo_zones: [
           {
-            country_code: 'hr',
+            country_code: 'ZA',
             type: 'country',
           },
           {
-            country_code: 'gb',
+            country_code: 'BW',
             type: 'country',
           },
           {
-            country_code: 'de',
+            country_code: 'ZM',
             type: 'country',
           },
           {
-            country_code: 'dk',
+            country_code: 'MZ',
             type: 'country',
           },
           {
-            country_code: 'se',
+            country_code: 'NM',
             type: 'country',
           },
           {
-            country_code: 'fr',
+            country_code: 'KE',
             type: 'country',
           },
           {
-            country_code: 'es',
+            country_code: 'UG',
             type: 'country',
           },
           {
-            country_code: 'it',
+            country_code: 'RW',
             type: 'country',
           },
         ],
       },
     ],
-  });
+  })
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
@@ -216,7 +228,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
     [Modules.FULFILLMENT]: {
       fulfillment_set_id: fulfillmentSet.id,
     },
-  });
+  })
 
   await createShippingOptionsWorkflow(container).run({
     input: [
@@ -297,7 +309,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         ],
       },
     ],
-  });
+  })
 
   const pickupFulfillmentSet =
     await fulfillmentModuleService.createFulfillmentSets({
@@ -318,7 +330,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
           ],
         },
       ],
-    });
+    })
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
@@ -327,7 +339,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
     [Modules.FULFILLMENT]: {
       fulfillment_set_id: pickupFulfillmentSet.id,
     },
-  });
+  })
 
   await createShippingOptionsWorkflow(container).run({
     input: [
@@ -370,21 +382,21 @@ export default async function seedDemoData({ container }: ExecArgs) {
         ],
       },
     ],
-  });
+  })
 
-  logger.info('Finished seeding fulfillment data.');
+  logger.info('Finished seeding fulfillment data.')
 
   await linkSalesChannelsToStockLocationWorkflow(container).run({
     input: {
       id: stockLocation.id,
       add: [defaultSalesChannel[0].id],
     },
-  });
-  logger.info('Finished seeding stock location data.');
+  })
+  logger.info('Finished seeding stock location data.')
 
-  logger.info('Seeding publishable API key data...');
+  logger.info('Seeding publishable API key data...')
   const { result: publishableApiKeyResult } = await createApiKeysWorkflow(
-    container,
+    container
   ).run({
     input: {
       api_keys: [
@@ -395,21 +407,21 @@ export default async function seedDemoData({ container }: ExecArgs) {
         },
       ],
     },
-  });
-  const publishableApiKey = publishableApiKeyResult[0];
+  })
+  const publishableApiKey = publishableApiKeyResult[0]
 
   await linkSalesChannelsToApiKeyWorkflow(container).run({
     input: {
       id: publishableApiKey.id,
       add: [defaultSalesChannel[0].id],
     },
-  });
-  logger.info('Finished seeding publishable API key data.');
+  })
+  logger.info('Finished seeding publishable API key data.')
 
-  logger.info('Seeding product data...');
+  logger.info('Seeding product data...')
 
   const { result: categoryResult } = await createProductCategoriesWorkflow(
-    container,
+    container
   ).run({
     input: {
       product_categories: [
@@ -427,7 +439,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         },
       ],
     },
-  });
+  })
 
   const [sofasImage, armChairsImage] = await uploadFilesWorkflow(container)
     .run({
@@ -438,7 +450,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'sofas.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/product-types/sofas/image.png',
+              'https://assets.agilo.com/fashion-starter/product-types/sofas/image.png'
             ),
           },
           {
@@ -446,16 +458,16 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'arm-chairs.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/product-types/arm-chairs/image.png',
+              'https://assets.agilo.com/fashion-starter/product-types/arm-chairs/image.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   const { result: productTypes } = await createProductTypesWorkflow(
-    container,
+    container
   ).run({
     input: {
       product_types: [
@@ -473,7 +485,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         },
       ],
     },
-  });
+  })
 
   const [
     scandinavianSimplicityImage,
@@ -505,7 +517,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'scandinavian-simplicity.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/image.png',
+              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/image.png'
             ),
           },
           {
@@ -513,7 +525,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'scandinavian-simplicity-collection-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/collection_page_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/collection_page_image.png'
             ),
           },
           {
@@ -521,7 +533,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'scandinavian-simplicity-product-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_image.png'
             ),
           },
           {
@@ -529,7 +541,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'scandinavian-simplicity-product-page-wide-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_wide_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_wide_image.png'
             ),
           },
           {
@@ -537,7 +549,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'scandinavian-simplicity-product-page-cta-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_cta_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_cta_image.png'
             ),
           },
           {
@@ -545,7 +557,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'modern-luxe.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/image.png',
+              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/image.png'
             ),
           },
           {
@@ -553,7 +565,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'modern-luxe-collection-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/collection_page_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/collection_page_image.png'
             ),
           },
           {
@@ -561,7 +573,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'modern-luxe-product-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_image.png'
             ),
           },
           {
@@ -569,7 +581,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'modern-luxe-product-page-wide-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_wide_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_wide_image.png'
             ),
           },
           {
@@ -577,7 +589,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'modern-luxe-product-page-cta-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_cta_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_cta_image.png'
             ),
           },
           {
@@ -585,7 +597,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'boho-chic.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/image.png',
+              'https://assets.agilo.com/fashion-starter/collections/boho-chic/image.png'
             ),
           },
           {
@@ -593,7 +605,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'boho-chic-collection-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/collection_page_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/boho-chic/collection_page_image.png'
             ),
           },
           {
@@ -601,7 +613,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'boho-chic-product-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_image.png'
             ),
           },
           {
@@ -609,7 +621,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'boho-chic-product-page-wide-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_wide_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_wide_image.png'
             ),
           },
           {
@@ -617,7 +629,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'boho-chic-product-page-cta-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_cta_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_cta_image.png'
             ),
           },
           {
@@ -625,7 +637,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'timeless-classics.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/image.png',
+              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/image.png'
             ),
           },
           {
@@ -633,7 +645,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'timeless-classics-collection-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/collection_page_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/collection_page_image.png'
             ),
           },
           {
@@ -641,7 +653,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'timeless-classics-product-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_image.png'
             ),
           },
           {
@@ -649,7 +661,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'timeless-classics-product-page-wide-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_wide_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_wide_image.png'
             ),
           },
           {
@@ -657,16 +669,16 @@ export default async function seedDemoData({ container }: ExecArgs) {
             filename: 'timeless-classics-product-page-cta-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_cta_image.png',
+              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_cta_image.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   const { result: collections } = await createCollectionsWorkflow(
-    container,
+    container
   ).run({
     input: {
       collections: [
@@ -762,109 +774,115 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const materials: MaterialModelType[] =
-    await fashionModuleService.createMaterials([
+  const productLengths: ProductLengthModelType[] =
+    await hairPropsModuleService.createProductLengths([
       {
-        name: 'Velvet',
+        name: '8"',
       },
       {
-        name: 'Linen',
+        name: '10"',
       },
       {
-        name: 'Boucle',
+        name: '12"',
       },
       {
-        name: 'Leather',
+        name: '14"',
       },
       {
-        name: 'Microfiber',
+        name: '16"',
       },
-    ]);
+      {
+        name: '18"',
+      },
+      {
+        name: '20"',
+      },
+      {
+        name: '22"',
+      },
+      {
+        name: '24"',
+      },
+      {
+        name: '26"',
+      },
+      {
+        name: '28"',
+      },
+      {
+        name: '30"',
+      },
+    ])
 
-  await fashionModuleService.createColors([
+  await hairPropsModuleService.createCapSizes([
     // Velvet
     {
       name: 'Black',
-      hex_code: '#4C4D4E',
-      material_id: materials.find((m) => m.name === 'Velvet').id,
+      product_length_id: productLengths.find((m) => m.name === '8"').id,
     },
     {
       name: 'Purple',
-      hex_code: '#904C94',
-      material_id: materials.find((m) => m.name === 'Velvet').id,
+      product_length_id: productLengths.find((m) => m.name === '10"').id,
     },
     // Linen
     {
       name: 'Green',
-      hex_code: '#438849',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      product_length_id: productLengths.find((m) => m.name === '12"').id,
     },
     {
       name: 'Light Gray',
-      hex_code: '#B1B1B1',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      product_length_id: productLengths.find((m) => m.name === '14"').id,
     },
     {
       name: 'Yellow',
-      hex_code: '#F1BD37',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      product_length_id: productLengths.find((m) => m.name === '16"').id,
     },
     {
       name: 'Red',
-      hex_code: '#CD1F23',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      product_length_id: productLengths.find((m) => m.name === '18"').id,
     },
     {
       name: 'Blue',
-      hex_code: '#475F8A',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      product_length_id: productLengths.find((m) => m.name === '20"').id,
     },
     // Microfiber
     {
       name: 'Orange',
-      hex_code: '#EF7218',
-      material_id: materials.find((m) => m.name === 'Microfiber').id,
+      product_length_id: productLengths.find((m) => m.name === '22"').id,
     },
     {
       name: 'Dark Gray',
-      hex_code: '#4A4A4A',
-      material_id: materials.find((m) => m.name === 'Microfiber').id,
+      product_length_id: productLengths.find((m) => m.name === '24"').id,
     },
     {
       name: 'Black',
-      hex_code: '#282828',
-      material_id: materials.find((m) => m.name === 'Microfiber').id,
+      product_length_id: productLengths.find((m) => m.name === '26"').id,
     },
     // Boucle
     {
       name: 'Beige',
-      hex_code: '#C8BCB3',
-      material_id: materials.find((m) => m.name === 'Boucle').id,
+      product_length_id: productLengths.find((m) => m.name === '28"').id,
     },
     {
       name: 'White',
-      hex_code: '#EAEAEA',
-      material_id: materials.find((m) => m.name === 'Boucle').id,
+      product_length_id: productLengths.find((m) => m.name === '30"').id,
     },
     {
       name: 'Light Gray',
-      hex_code: '#C3C0BE',
-      material_id: materials.find((m) => m.name === 'Boucle').id,
+      product_length_id: productLengths.find((m) => m.name === '32"').id,
     },
     // Leather
     {
       name: 'Violet',
-      hex_code: '#B1ABBF',
-      material_id: materials.find((m) => m.name === 'Leather').id,
+      product_length_id: productLengths.find((m) => m.name === '32"').id,
     },
     {
       name: 'Beige',
-      hex_code: '#A79D9B',
-      material_id: materials.find((m) => m.name === 'Leather').id,
+      product_length_id: productLengths.find((m) => m.name === '32"').id,
     },
-  ]);
+  ])
 
   const astridCurveImages = await uploadFilesWorkflow(container)
     .run({
@@ -875,7 +893,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'astrid-curve.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/astrid-curve/image.png',
+              'https://assets.agilo.com/fashion-starter/products/astrid-curve/image.png'
             ),
           },
           {
@@ -883,13 +901,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'astrid-curve-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/astrid-curve/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/astrid-curve/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -964,7 +982,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const belimeEstateImages = await uploadFilesWorkflow(container)
     .run({
@@ -975,7 +993,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'belime-estate.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/belime-estate/image.png',
+              'https://assets.agilo.com/fashion-starter/products/belime-estate/image.png'
             ),
           },
           {
@@ -983,13 +1001,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'belime-estate-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/belime-estate/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/belime-estate/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1003,7 +1021,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             categoryResult.find((cat) => cat.name === 'Two seater').id,
           ],
           collection_id: collections.find(
-            (c) => c.handle === 'timeless-classics',
+            (c) => c.handle === 'timeless-classics'
           ).id,
           type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
           status: ProductStatus.PUBLISHED,
@@ -1085,7 +1103,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const cypressRetreatImages = await uploadFilesWorkflow(container)
     .run({
@@ -1096,7 +1114,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'cypress-retreat.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/cypress-retreat/image.png',
+              'https://assets.agilo.com/fashion-starter/products/cypress-retreat/image.png'
             ),
           },
           {
@@ -1104,13 +1122,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'cypress-retreat-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/cypress-retreat/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/cypress-retreat/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1124,7 +1142,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             categoryResult.find((cat) => cat.name === 'Three seater').id,
           ],
           collection_id: collections.find(
-            (c) => c.handle === 'timeless-classics',
+            (c) => c.handle === 'timeless-classics'
           ).id,
           type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
           status: ProductStatus.PUBLISHED,
@@ -1187,7 +1205,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const everlyEstateImages = await uploadFilesWorkflow(container)
     .run({
@@ -1198,7 +1216,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'everly-estate.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/everly-estate/image.png',
+              'https://assets.agilo.com/fashion-starter/products/everly-estate/image.png'
             ),
           },
           {
@@ -1206,13 +1224,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'everly-estate-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/everly-estate/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/everly-estate/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1287,7 +1305,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const havenhillEstateImages = await uploadFilesWorkflow(container)
     .run({
@@ -1298,7 +1316,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'havenhill-estate.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/havenhill-estate/image.png',
+              'https://assets.agilo.com/fashion-starter/products/havenhill-estate/image.png'
             ),
           },
           {
@@ -1306,13 +1324,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'havenhill-estate-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/havenhill-estate/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/havenhill-estate/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1326,7 +1344,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             categoryResult.find((cat) => cat.name === 'One seater').id,
           ],
           collection_id: collections.find(
-            (c) => c.handle === 'timeless-classics',
+            (c) => c.handle === 'timeless-classics'
           ).id,
           type_id: productTypes.find((pt) => pt.value === 'Arm Chairs').id,
           status: ProductStatus.PUBLISHED,
@@ -1389,7 +1407,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const monacoFlairImages = await uploadFilesWorkflow(container)
     .run({
@@ -1400,7 +1418,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'monaco-flair.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/monaco-flair/image.png',
+              'https://assets.agilo.com/fashion-starter/products/monaco-flair/image.png'
             ),
           },
           {
@@ -1408,13 +1426,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'monaco-flair-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/monaco-flair/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/monaco-flair/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1508,7 +1526,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const nordicBreezeImages = await uploadFilesWorkflow(container)
     .run({
@@ -1519,7 +1537,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'nordic-breeze.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/nordic-breeze/image.png',
+              'https://assets.agilo.com/fashion-starter/products/nordic-breeze/image.png'
             ),
           },
           {
@@ -1527,13 +1545,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'nordic-breeze-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/nordic-breeze/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/nordic-breeze/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1547,7 +1565,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             categoryResult.find((cat) => cat.name === 'One seater').id,
           ],
           collection_id: collections.find(
-            (c) => c.handle === 'scandinavian-simplicity',
+            (c) => c.handle === 'scandinavian-simplicity'
           ).id,
           type_id: productTypes.find((pt) => pt.value === 'Arm Chairs').id,
           status: ProductStatus.PUBLISHED,
@@ -1629,7 +1647,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const nordicHavenImages = await uploadFilesWorkflow(container)
     .run({
@@ -1640,7 +1658,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'nordic-haven.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/nordic-haven/image.png',
+              'https://assets.agilo.com/fashion-starter/products/nordic-haven/image.png'
             ),
           },
           {
@@ -1648,13 +1666,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'nordic-haven-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/nordic-haven/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/nordic-haven/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1668,7 +1686,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             categoryResult.find((cat) => cat.name === 'Three seater').id,
           ],
           collection_id: collections.find(
-            (c) => c.handle === 'scandinavian-simplicity',
+            (c) => c.handle === 'scandinavian-simplicity'
           ).id,
           type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
           status: ProductStatus.PUBLISHED,
@@ -1750,7 +1768,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const osloDriftImages = await uploadFilesWorkflow(container)
     .run({
@@ -1761,7 +1779,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'oslo-drift.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/oslo-drift/image.png',
+              'https://assets.agilo.com/fashion-starter/products/oslo-drift/image.png'
             ),
           },
           {
@@ -1769,13 +1787,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'oslo-drift-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/oslo-drift/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/oslo-drift/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1789,7 +1807,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             categoryResult.find((cat) => cat.name === 'Two seater').id,
           ],
           collection_id: collections.find(
-            (c) => c.handle === 'scandinavian-simplicity',
+            (c) => c.handle === 'scandinavian-simplicity'
           ).id,
           type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
           status: ProductStatus.PUBLISHED,
@@ -1871,7 +1889,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const osloSerenityImages = await uploadFilesWorkflow(container)
     .run({
@@ -1882,7 +1900,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'oslo-serenity.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/oslo-serenity/image.png',
+              'https://assets.agilo.com/fashion-starter/products/oslo-serenity/image.png'
             ),
           },
           {
@@ -1890,13 +1908,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'oslo-serenity-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/oslo-serenity/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/oslo-serenity/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -1910,7 +1928,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             categoryResult.find((cat) => cat.name === 'Two seater').id,
           ],
           collection_id: collections.find(
-            (c) => c.handle === 'scandinavian-simplicity',
+            (c) => c.handle === 'scandinavian-simplicity'
           ).id,
           type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
           status: ProductStatus.PUBLISHED,
@@ -1973,7 +1991,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const palomaHavenImages = await uploadFilesWorkflow(container)
     .run({
@@ -1984,7 +2002,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'paloma-haven.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/paloma-haven/image.png',
+              'https://assets.agilo.com/fashion-starter/products/paloma-haven/image.png'
             ),
           },
           {
@@ -1992,13 +2010,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'paloma-haven-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/paloma-haven/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/paloma-haven/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -2092,7 +2110,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const savannahGroveImages = await uploadFilesWorkflow(container)
     .run({
@@ -2103,7 +2121,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'savannah-grove.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/savannah-grove/image.png',
+              'https://assets.agilo.com/fashion-starter/products/savannah-grove/image.png'
             ),
           },
           {
@@ -2111,13 +2129,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'savannah-grove-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/savannah-grove/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/savannah-grove/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -2211,7 +2229,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const serenaMeadowImages = await uploadFilesWorkflow(container)
     .run({
@@ -2222,7 +2240,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'serena-meadow.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/serena-meadow/image.png',
+              'https://assets.agilo.com/fashion-starter/products/serena-meadow/image.png'
             ),
           },
           {
@@ -2230,13 +2248,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'serena-meadow-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/serena-meadow/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/serena-meadow/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -2250,7 +2268,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             categoryResult.find((cat) => cat.name === 'Two seater').id,
           ],
           collection_id: collections.find(
-            (c) => c.handle === 'timeless-classics',
+            (c) => c.handle === 'timeless-classics'
           ).id,
           type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
           status: ProductStatus.PUBLISHED,
@@ -2332,7 +2350,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const suttonRoyaleImages = await uploadFilesWorkflow(container)
     .run({
@@ -2343,7 +2361,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'sutton-royale.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/sutton-royale/image.png',
+              'https://assets.agilo.com/fashion-starter/products/sutton-royale/image.png'
             ),
           },
           {
@@ -2351,13 +2369,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'sutton-royale-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/sutton-royale/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/sutton-royale/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -2432,7 +2450,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const velarLoftImages = await uploadFilesWorkflow(container)
     .run({
@@ -2443,7 +2461,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'velar-loft.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/velar-loft/image.png',
+              'https://assets.agilo.com/fashion-starter/products/velar-loft/image.png'
             ),
           },
           {
@@ -2451,13 +2469,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'velar-loft-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/velar-loft/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/velar-loft/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -2532,7 +2550,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
   const veloraLuxeImages = await uploadFilesWorkflow(container)
     .run({
@@ -2543,7 +2561,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'velora-luxe.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/velora-luxe/image.png',
+              'https://assets.agilo.com/fashion-starter/products/velora-luxe/image.png'
             ),
           },
           {
@@ -2551,13 +2569,13 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
             filename: 'velora-luxe-2.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/velora-luxe/image1.png',
+              'https://assets.agilo.com/fashion-starter/products/velora-luxe/image1.png'
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
@@ -2632,7 +2650,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  logger.info('Finished seeding product data.');
+  logger.info('Finished seeding product data.')
 }

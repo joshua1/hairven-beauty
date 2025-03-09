@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { defineWidgetConfig } from '@medusajs/admin-sdk';
-import { DetailWidgetProps, AdminProduct } from '@medusajs/framework/types';
+import * as React from 'react'
+import { defineWidgetConfig } from '@medusajs/admin-sdk'
+import { DetailWidgetProps, AdminProduct } from '@medusajs/framework/types'
 import {
   Container,
   Heading,
@@ -8,20 +8,20 @@ import {
   Button,
   Drawer,
   IconButton,
-} from '@medusajs/ui';
-import { ArrowPath, PlusMini } from '@medusajs/icons';
-import { z } from 'zod';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+} from '@medusajs/ui'
+import { ArrowPath, PlusMini } from '@medusajs/icons'
+import { z } from 'zod'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { MaterialModelType } from '../../modules/fashion/models/material';
+import { MaterialModelType } from '../../modules/hair-props/models/product-length'
 
-import { Form } from '../components/Form/Form';
-import { withQueryClient } from '../components/QueryClientProvider';
+import { Form } from '../components/Form/Form'
+import { withQueryClient } from '../components/QueryClientProvider'
 import {
   useCreateColorMutation,
   useCreateMaterialMutation,
-} from '../hooks/fashion';
-import { InputField } from '../components/Form/InputField';
+} from '../hooks/fashion'
+import { InputField } from '../components/Form/InputField'
 
 // const SelectColorField: React.FC<{
 //   name: string;
@@ -94,15 +94,15 @@ import { InputField } from '../components/Form/InputField';
 const addColorFormSchema = z.object({
   name: z.string().min(1),
   hex_code: z.string().min(7).max(7),
-});
+})
 
 const AddColorDrawer: React.FC<{
-  materialId: string;
-  name: string;
-  children: React.ReactNode;
+  materialId: string
+  name: string
+  children: React.ReactNode
 }> = ({ materialId, name, children }) => {
-  const queryClient = useQueryClient();
-  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+  const queryClient = useQueryClient()
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false)
   const createColorMutation = useCreateColorMutation(materialId, {
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -110,10 +110,10 @@ const AddColorDrawer: React.FC<{
           query.queryKey.length >= 3 &&
           query.queryKey[0] === 'product' &&
           query.queryKey[2] === 'fashion',
-      });
-      setIsDrawerOpen(false);
+      })
+      setIsDrawerOpen(false)
     },
-  });
+  })
 
   return (
     <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
@@ -126,7 +126,7 @@ const AddColorDrawer: React.FC<{
           <Form
             schema={addColorFormSchema}
             onSubmit={async (values) => {
-              createColorMutation.mutate(values);
+              createColorMutation.mutate(values)
             }}
             defaultValues={{
               name,
@@ -169,8 +169,8 @@ const AddColorDrawer: React.FC<{
         </Drawer.Footer>
       </Drawer.Content>
     </Drawer>
-  );
-};
+  )
+}
 
 const ProductFashionWidget = withQueryClient(
   ({ data }: DetailWidgetProps<AdminProduct>) => {
@@ -180,28 +180,28 @@ const ProductFashionWidget = withQueryClient(
         const res = await fetch(`/admin/products/${data.id}/fashion`, {
           credentials: 'include',
           signal,
-        });
+        })
         return res.json() as Promise<{
-          missing_materials: string[];
-          materials: (MaterialModelType & { missing_colors: string[] })[];
-        }>;
+          missing_materials: string[]
+          materials: (MaterialModelType & { missing_colors: string[] })[]
+        }>
       },
-    });
+    })
     const createMaterialMutation = useCreateMaterialMutation({
       onSuccess: () => {
-        productFashion.refetch();
+        productFashion.refetch()
       },
-    });
+    })
 
     const materialsData = [
       ...(productFashion.data?.missing_materials ?? []),
       ...(productFashion.data?.materials ?? []),
     ].sort((a, b) => {
-      const aName = typeof a === 'string' ? a : a.name;
-      const bName = typeof b === 'string' ? b : b.name;
+      const aName = typeof a === 'string' ? a : a.name
+      const bName = typeof b === 'string' ? b : b.name
 
-      return aName.localeCompare(bName);
-    });
+      return aName.localeCompare(bName)
+    })
 
     return (
       <Container className="divide-y p-0">
@@ -211,8 +211,8 @@ const ProductFashionWidget = withQueryClient(
             variant="transparent"
             className="text-ui-fg-muted hover:text-ui-fg-subtle"
             onClick={(event) => {
-              event.preventDefault();
-              productFashion.refetch();
+              event.preventDefault()
+              productFashion.refetch()
             }}
             disabled={productFashion.isFetching}
             isLoading={productFashion.isFetching}
@@ -251,10 +251,10 @@ const ProductFashionWidget = withQueryClient(
                     <Button
                       variant="secondary"
                       onClick={(event) => {
-                        event.preventDefault();
+                        event.preventDefault()
                         createMaterialMutation.mutate({
                           name: material,
-                        });
+                        })
                       }}
                     >
                       Create material
@@ -300,12 +300,12 @@ const ProductFashionWidget = withQueryClient(
           )}
         </div>
       </Container>
-    );
-  },
-);
+    )
+  }
+)
 
 export const config = defineWidgetConfig({
   zone: 'product.details.side.before',
-});
+})
 
-export default ProductFashionWidget;
+export default ProductFashionWidget

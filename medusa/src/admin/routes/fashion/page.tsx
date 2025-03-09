@@ -1,12 +1,12 @@
-import * as React from 'react';
-import { defineRouteConfig } from '@medusajs/admin-sdk';
+import * as React from 'react'
+import { defineRouteConfig } from '@medusajs/admin-sdk'
 import {
   Swatch,
   PencilSquare,
   EllipsisHorizontal,
   Trash,
   ArrowPath,
-} from '@medusajs/icons';
+} from '@medusajs/icons'
 import {
   Container,
   Heading,
@@ -19,43 +19,43 @@ import {
   Prompt,
   Switch,
   Label,
-} from '@medusajs/ui';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams, Link } from 'react-router-dom';
+} from '@medusajs/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams, Link } from 'react-router-dom'
 
-import { MaterialModelType } from '../../../modules/fashion/models/material';
-import { useCreateMaterialMutation } from '../../hooks/fashion';
-import { Form } from '../../components/Form/Form';
-import { InputField } from '../../components/Form/InputField';
+import { MaterialModelType } from '../../../modules/hair-props/models/product-length'
+import { useCreateMaterialMutation } from '../../hooks/fashion'
+import { Form } from '../../components/Form/Form'
+import { InputField } from '../../components/Form/InputField'
 import {
   EditMaterialDrawer,
   materialFormSchema,
-} from '../../components/EditMaterialDrawer';
-import { withQueryClient } from '../../components/QueryClientProvider';
+} from '../../components/EditMaterialDrawer'
+import { withQueryClient } from '../../components/QueryClientProvider'
 
 const DeleteMaterialPrompt: React.FC<{
-  id: string;
-  name: string;
-  children: React.ReactNode;
+  id: string
+  name: string
+  children: React.ReactNode
 }> = ({ id, name, children }) => {
-  const queryClient = useQueryClient();
-  const [isPromptOpen, setIsPromptOpen] = React.useState(false);
+  const queryClient = useQueryClient()
+  const [isPromptOpen, setIsPromptOpen] = React.useState(false)
   const deleteMaterialMutation = useMutation({
     mutationKey: ['fashion', id, 'delete'],
     mutationFn: async () => {
       return fetch(`/admin/fashion/${id}`, {
         method: 'DELETE',
         credentials: 'include',
-      }).then((res) => res.json());
+      }).then((res) => res.json())
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         predicate: (query) => query.queryKey[0] === 'fashion',
-      });
+      })
 
-      setIsPromptOpen(false);
+      setIsPromptOpen(false)
     },
-  });
+  })
 
   return (
     <Prompt open={isPromptOpen} onOpenChange={setIsPromptOpen}>
@@ -71,7 +71,7 @@ const DeleteMaterialPrompt: React.FC<{
           <Prompt.Cancel>Cancel</Prompt.Cancel>
           <Prompt.Action
             onClick={() => {
-              deleteMaterialMutation.mutate();
+              deleteMaterialMutation.mutate()
             }}
           >
             Delete
@@ -79,32 +79,32 @@ const DeleteMaterialPrompt: React.FC<{
         </Prompt.Footer>
       </Prompt.Content>
     </Prompt>
-  );
-};
+  )
+}
 
 const RestoreMaterialPrompt: React.FC<{
-  id: string;
-  name: string;
-  children: React.ReactNode;
+  id: string
+  name: string
+  children: React.ReactNode
 }> = ({ id, name, children }) => {
-  const queryClient = useQueryClient();
-  const [isPromptOpen, setIsPromptOpen] = React.useState(false);
+  const queryClient = useQueryClient()
+  const [isPromptOpen, setIsPromptOpen] = React.useState(false)
   const restoreMaterialMutation = useMutation({
     mutationKey: ['fashion', id, 'restore'],
     mutationFn: async () => {
       return fetch(`/admin/fashion/${id}/restore`, {
         method: 'POST',
         credentials: 'include',
-      }).then((res) => res.json());
+      }).then((res) => res.json())
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         predicate: (query) => query.queryKey[0] === 'fashion',
-      });
+      })
 
-      setIsPromptOpen(false);
+      setIsPromptOpen(false)
     },
-  });
+  })
 
   return (
     <Prompt open={isPromptOpen} onOpenChange={setIsPromptOpen}>
@@ -120,7 +120,7 @@ const RestoreMaterialPrompt: React.FC<{
           <Prompt.Cancel>Cancel</Prompt.Cancel>
           <Prompt.Action
             onClick={() => {
-              restoreMaterialMutation.mutate();
+              restoreMaterialMutation.mutate()
             }}
           >
             Restore
@@ -128,40 +128,40 @@ const RestoreMaterialPrompt: React.FC<{
         </Prompt.Footer>
       </Prompt.Content>
     </Prompt>
-  );
-};
+  )
+}
 
 const FashionPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const page = Number(searchParams.get('page')) || 1;
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = Number(searchParams.get('page')) || 1
   const setPage = React.useCallback(
     (page: number) => {
       setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.set('page', page.toString());
-        return next;
-      });
+        const next = new URLSearchParams(prev)
+        next.set('page', page.toString())
+        return next
+      })
     },
-    [setSearchParams],
-  );
-  const deleted = searchParams.has('deleted');
+    [setSearchParams]
+  )
+  const deleted = searchParams.has('deleted')
   const toggleDeleted = React.useCallback(() => {
     setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
+      const next = new URLSearchParams(prev)
 
       if (prev.has('page')) {
-        next.delete('page');
+        next.delete('page')
       }
 
       if (!prev.has('deleted')) {
-        next.set('deleted', '');
+        next.set('deleted', '')
       } else {
-        next.delete('deleted');
+        next.delete('deleted')
       }
-      return next;
-    });
-  }, [setSearchParams]);
-  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+      return next
+    })
+  }, [setSearchParams])
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
 
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ['fashion', deleted, page],
@@ -170,20 +170,20 @@ const FashionPage = () => {
         `/admin/fashion?page=${page}${deleted ? '&deleted=true' : ''}`,
         {
           credentials: 'include',
-        },
+        }
       ).then(
         (res) =>
           res.json() as Promise<{
-            materials: MaterialModelType[];
-            count: number;
-            page: number;
-            last_page: number;
-          }>,
-      );
+            materials: MaterialModelType[]
+            count: number
+            page: number
+            last_page: number
+          }>
+      )
     },
-  });
+  })
 
-  const createMaterialMutation = useCreateMaterialMutation();
+  const createMaterialMutation = useCreateMaterialMutation()
 
   return (
     <Container className="px-0">
@@ -195,7 +195,7 @@ const FashionPage = () => {
               id="deleted-flag"
               checked={deleted}
               onClick={() => {
-                toggleDeleted();
+                toggleDeleted()
               }}
             />
             <Label htmlFor="deleted-flag">Show Deleted</Label>
@@ -214,8 +214,8 @@ const FashionPage = () => {
                 <Form
                   schema={materialFormSchema}
                   onSubmit={async (values) => {
-                    await createMaterialMutation.mutateAsync(values);
-                    setIsCreateModalOpen(false);
+                    await createMaterialMutation.mutateAsync(values)
+                    setIsCreateModalOpen(false)
                   }}
                   formProps={{
                     id: 'create-material-form',
@@ -352,12 +352,12 @@ const FashionPage = () => {
         nextPage={() => setPage(Math.min(page + 1, data?.last_page ?? 1))}
       />
     </Container>
-  );
-};
+  )
+}
 
-export default withQueryClient(FashionPage);
+export default withQueryClient(FashionPage)
 
 export const config = defineRouteConfig({
   label: 'Materials & Colors',
   icon: Swatch,
-});
+})

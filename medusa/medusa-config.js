@@ -1,6 +1,6 @@
-const { loadEnv, defineConfig } = require('@medusajs/framework/utils');
+const { loadEnv, defineConfig } = require('@medusajs/framework/utils')
 
-loadEnv(process.env.NODE_ENV, process.cwd());
+loadEnv(process.env.NODE_ENV, process.cwd())
 
 module.exports = defineConfig({
   admin: {
@@ -36,7 +36,7 @@ module.exports = defineConfig({
       },
     },
     {
-      resolve: './src/modules/fashion',
+      resolve: './src/modules/hair-props',
     },
     {
       resolve: '@medusajs/medusa/file',
@@ -62,4 +62,4 @@ module.exports = defineConfig({
       },
     },
   ],
-});
+})
