@@ -23,34 +23,34 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams, Link } from 'react-router-dom'
 
-import { MaterialModelType } from '../../../modules/hair-props/models/product-length'
-import { useCreateMaterialMutation } from '../../hooks/fashion'
+import { ProductLengthModelType } from '../../../modules/hair-props/models/product-length'
+import { useCreateProductLengthMutation } from '../../hooks/hair-props'
 import { Form } from '../../components/Form/Form'
 import { InputField } from '../../components/Form/InputField'
 import {
-  EditMaterialDrawer,
-  materialFormSchema,
-} from '../../components/EditMaterialDrawer'
+  EditProductLengthDrawer,
+  productLengthFormSchema,
+} from '../../components/EditProductLengthDrawer'
 import { withQueryClient } from '../../components/QueryClientProvider'
 
-const DeleteMaterialPrompt: React.FC<{
+const DeleteProductLengthPrompt: React.FC<{
   id: string
   name: string
   children: React.ReactNode
 }> = ({ id, name, children }) => {
   const queryClient = useQueryClient()
   const [isPromptOpen, setIsPromptOpen] = React.useState(false)
-  const deleteMaterialMutation = useMutation({
-    mutationKey: ['fashion', id, 'delete'],
+  const deleteProductLengthMutation = useMutation({
+    mutationKey: ['hair-props', id, 'delete'],
     mutationFn: async () => {
-      return fetch(`/admin/fashion/${id}`, {
+      return fetch(`/admin/hair-props/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       }).then((res) => res.json())
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
+        predicate: (query) => query.queryKey[0] === 'hair-props',
       })
 
       setIsPromptOpen(false)
@@ -62,16 +62,16 @@ const DeleteMaterialPrompt: React.FC<{
       <Prompt.Trigger asChild>{children}</Prompt.Trigger>
       <Prompt.Content>
         <Prompt.Header>
-          <Prompt.Title>Delete {name} material?</Prompt.Title>
+          <Prompt.Title>Delete {name} product length?</Prompt.Title>
           <Prompt.Description>
-            Are you sure you want to delete the material {name}?
+            Are you sure you want to delete the product length {name}?
           </Prompt.Description>
         </Prompt.Header>
         <Prompt.Footer>
           <Prompt.Cancel>Cancel</Prompt.Cancel>
           <Prompt.Action
             onClick={() => {
-              deleteMaterialMutation.mutate()
+              deleteProductLengthMutation.mutate()
             }}
           >
             Delete
@@ -82,24 +82,24 @@ const DeleteMaterialPrompt: React.FC<{
   )
 }
 
-const RestoreMaterialPrompt: React.FC<{
+const RestoreProductLengthPrompt: React.FC<{
   id: string
   name: string
   children: React.ReactNode
 }> = ({ id, name, children }) => {
   const queryClient = useQueryClient()
   const [isPromptOpen, setIsPromptOpen] = React.useState(false)
-  const restoreMaterialMutation = useMutation({
-    mutationKey: ['fashion', id, 'restore'],
+  const restoreProductLengthMutation = useMutation({
+    mutationKey: ['hair-props', id, 'restore'],
     mutationFn: async () => {
-      return fetch(`/admin/fashion/${id}/restore`, {
+      return fetch(`/admin/hair-props/${id}/restore`, {
         method: 'POST',
         credentials: 'include',
       }).then((res) => res.json())
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
+        predicate: (query) => query.queryKey[0] === 'hair-props',
       })
 
       setIsPromptOpen(false)
@@ -111,16 +111,16 @@ const RestoreMaterialPrompt: React.FC<{
       <Prompt.Trigger asChild>{children}</Prompt.Trigger>
       <Prompt.Content>
         <Prompt.Header>
-          <Prompt.Title>Restore {name} material?</Prompt.Title>
+          <Prompt.Title>Restore {name} product length?</Prompt.Title>
           <Prompt.Description>
-            Are you sure you want to restore the material {name}?
+            Are you sure you want to restore the product length {name}?
           </Prompt.Description>
         </Prompt.Header>
         <Prompt.Footer>
           <Prompt.Cancel>Cancel</Prompt.Cancel>
           <Prompt.Action
             onClick={() => {
-              restoreMaterialMutation.mutate()
+              restoreProductLengthMutation.mutate()
             }}
           >
             Restore
@@ -131,7 +131,7 @@ const RestoreMaterialPrompt: React.FC<{
   )
 }
 
-const FashionPage = () => {
+const ProductLengthsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
   const setPage = React.useCallback(
@@ -164,17 +164,17 @@ const FashionPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
 
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['fashion', deleted, page],
+    queryKey: ['hair-props', deleted, page],
     queryFn: async () => {
       return fetch(
-        `/admin/fashion?page=${page}${deleted ? '&deleted=true' : ''}`,
+        `/admin/hair-props?page=${page}${deleted ? '&deleted=true' : ''}`,
         {
           credentials: 'include',
         }
       ).then(
         (res) =>
           res.json() as Promise<{
-            materials: MaterialModelType[]
+            product_lengths: ProductLengthModelType[]
             count: number
             page: number
             last_page: number
@@ -183,12 +183,12 @@ const FashionPage = () => {
     },
   })
 
-  const createMaterialMutation = useCreateMaterialMutation()
+  const createProductLengthMutation = useCreateProductLengthMutation()
 
   return (
     <Container className="px-0">
-      <div className="px-6 flex flex-row gap-6 justify-between items-center mb-4">
-        <Heading level="h2">Materials</Heading>
+      <div className="flex flex-row items-center justify-between gap-6 px-6 mb-4">
+        <Heading level="h2">Product Lengths</Heading>
         <div className="flex flex-row gap-4">
           <div className="flex items-center gap-x-2">
             <Switch
@@ -212,9 +212,9 @@ const FashionPage = () => {
               </Drawer.Header>
               <Drawer.Body>
                 <Form
-                  schema={materialFormSchema}
+                  schema={productLengthFormSchema}
                   onSubmit={async (values) => {
-                    await createMaterialMutation.mutateAsync(values)
+                    await createProductLengthMutation.mutateAsync(values)
                     setIsCreateModalOpen(false)
                   }}
                   formProps={{
@@ -231,7 +231,7 @@ const FashionPage = () => {
                 <Button
                   type="submit"
                   form="create-material-form"
-                  isLoading={createMaterialMutation.isPending}
+                  isLoading={createProductLengthMutation.isPending}
                 >
                   Create
                 </Button>
@@ -264,20 +264,22 @@ const FashionPage = () => {
               </Table.Cell>
             </Table.Row>
           )}
-          {isSuccess && data.materials.length === 0 && (
+          {isSuccess && data.product_lengths.length === 0 && (
             <Table.Row>
               {/* @ts-ignore */}
               <Table.Cell colSpan={2}>
-                <Text>No materials found</Text>
+                <Text>No product lengths found</Text>
               </Table.Cell>
             </Table.Row>
           )}
           {isSuccess &&
-            data.materials.length > 0 &&
-            data.materials.map((material) => (
-              <Table.Row key={material.id}>
+            data.product_lengths.length > 0 &&
+            data.product_lengths.map((productLength) => (
+              <Table.Row key={productLength.id}>
                 <Table.Cell>
-                  <Link to={`/fashion/${material.id}`}>{material.name}</Link>
+                  <Link to={`/hair-props/${productLength.id}`}>
+                    {productLength.name}
+                  </Link>
                 </Table.Cell>
                 <Table.Cell className="text-right">
                   <DropdownMenu>
@@ -288,49 +290,49 @@ const FashionPage = () => {
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Content>
                       <DropdownMenu.Item asChild>
-                        <EditMaterialDrawer
-                          id={material.id}
-                          initialValues={material}
+                        <EditProductLengthDrawer
+                          id={productLength.id}
+                          initialValues={productLength}
                         >
                           <Button
                             variant="transparent"
-                            className="flex flex-row gap-2 items-center w-full justify-start"
+                            className="flex flex-row items-center justify-start w-full gap-2"
                           >
                             <PencilSquare className="text-ui-fg-subtle" />
                             Edit
                           </Button>
-                        </EditMaterialDrawer>
+                        </EditProductLengthDrawer>
                       </DropdownMenu.Item>
                       <DropdownMenu.Separator />
-                      {material.deleted_at ? (
+                      {productLength.deleted_at ? (
                         <DropdownMenu.Item asChild>
-                          <RestoreMaterialPrompt
-                            id={material.id}
-                            name={material.name}
+                          <RestoreProductLengthPrompt
+                            id={productLength.id}
+                            name={productLength.name}
                           >
                             <Button
                               variant="transparent"
-                              className="flex flex-row gap-2 items-center w-full justify-start"
+                              className="flex flex-row items-center justify-start w-full gap-2"
                             >
                               <ArrowPath className="text-ui-fg-subtle" />
                               Restore
                             </Button>
-                          </RestoreMaterialPrompt>
+                          </RestoreProductLengthPrompt>
                         </DropdownMenu.Item>
                       ) : (
                         <DropdownMenu.Item asChild>
-                          <DeleteMaterialPrompt
-                            id={material.id}
-                            name={material.name}
+                          <DeleteProductLengthPrompt
+                            id={productLength.id}
+                            name={productLength.name}
                           >
                             <Button
                               variant="transparent"
-                              className="flex flex-row gap-2 items-center w-full justify-start"
+                              className="flex flex-row items-center justify-start w-full gap-2"
                             >
                               <Trash className="text-ui-fg-subtle" />
                               Delete
                             </Button>
-                          </DeleteMaterialPrompt>
+                          </DeleteProductLengthPrompt>
                         </DropdownMenu.Item>
                       )}
                     </DropdownMenu.Content>
@@ -355,9 +357,9 @@ const FashionPage = () => {
   )
 }
 
-export default withQueryClient(FashionPage)
+export default withQueryClient(ProductLengthsPage)
 
 export const config = defineRouteConfig({
-  label: 'Materials & Colors',
+  label: 'Product Lengths & Cap Sizes',
   icon: Swatch,
 })

@@ -1,11 +1,11 @@
 import { model } from '@medusajs/framework/utils'
 import { InferTypeOf } from '@medusajs/framework/types'
-import Color from './cap-size'
+import CapSize from './cap-size'
 
 const ProductLength = model.define('productLength', {
   id: model.id().primaryKey(),
   name: model.text(),
-  colors: model.hasMany(() => Color),
+  capSizes: model.hasMany(() => CapSize),
 })
 
 export type ProductLengthModelType = InferTypeOf<typeof ProductLength>

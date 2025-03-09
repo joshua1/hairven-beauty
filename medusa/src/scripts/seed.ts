@@ -27,10 +27,9 @@ import {
   ProductStatus,
 } from '@medusajs/framework/utils'
 import type HairPropsModuleService from 'src/modules/hair-props/service'
-import type {
-  MaterialModelType,
-  ProductLengthModelType,
-} from 'src/modules/hair-props/models/product-length'
+import type { ProductLengthModelType } from 'src/modules/hair-props/models/product-length'
+import * as fs from 'fs/promises'
+import * as path from 'path'
 
 async function getImageUrlContent(url: string) {
   const response = await fetch(url)
@@ -42,6 +41,31 @@ async function getImageUrlContent(url: string) {
   const arrayBuffer = await response.arrayBuffer()
 
   return Buffer.from(arrayBuffer).toString('binary')
+}
+
+/**
+ * Reads an image file from the seed-images directory and returns its contents as a binary string
+ * @param filename The name of the image file to read
+ * @returns The file contents as a binary string
+ */
+async function getImageFileContent(filename: string) {
+  // Using the same approach as the existing code in this file
+  const fs = require('fs/promises')
+  const path = require('path')
+
+  // Use path.resolve to get an absolute path to the seed-images directory
+  const imagePath = path.resolve(
+    process.cwd(),
+    'src/scripts/seed-images',
+    filename
+  )
+
+  try {
+    const data = await fs.readFile(imagePath)
+    return data.toString('binary')
+  } catch (error) {
+    throw new Error(`Failed to read image file "${filename}": ${error.message}`)
+  }
 }
 
 export default async function seedDemoData({ container }: ExecArgs) {
@@ -239,60 +263,18 @@ export default async function seedDemoData({ container }: ExecArgs) {
         service_zone_id: fulfillmentSet.service_zones[0].id,
         shipping_profile_id: shippingProfile.id,
         type: {
-          label: 'Standard',
-          description: 'Ship in 2-3 days.',
+          label: 'Standard (Postnet)',
+          description: 'Ship in 2 working days.',
           code: 'standard',
         },
         prices: [
           {
-            currency_code: 'usd',
-            amount: 10,
-          },
-          {
-            currency_code: 'eur',
-            amount: 10,
+            currency_code: 'ZAR',
+            amount: 120,
           },
           {
             region_id: region.id,
-            amount: 10,
-          },
-        ],
-        rules: [
-          {
-            attribute: 'enabled_in_store',
-            value: '"true"',
-            operator: 'eq',
-          },
-          {
-            attribute: 'is_return',
-            value: 'false',
-            operator: 'eq',
-          },
-        ],
-      },
-      {
-        name: 'Express Shipping',
-        price_type: 'flat',
-        provider_id: 'manual_manual',
-        service_zone_id: fulfillmentSet.service_zones[0].id,
-        shipping_profile_id: shippingProfile.id,
-        type: {
-          label: 'Express',
-          description: 'Ship in 24 hours.',
-          code: 'express',
-        },
-        prices: [
-          {
-            currency_code: 'usd',
-            amount: 10,
-          },
-          {
-            currency_code: 'eur',
-            amount: 10,
-          },
-          {
-            region_id: region.id,
-            amount: 10,
+            amount: 120,
           },
         ],
         rules: [
@@ -317,14 +299,14 @@ export default async function seedDemoData({ container }: ExecArgs) {
       type: 'pickup',
       service_zones: [
         {
-          name: 'Store pickup',
+          name: 'Store pickup (JHB)',
           geo_zones: [
             {
-              country_code: 'hr',
+              country_code: 'ZA',
               type: 'country',
             },
             {
-              country_code: 'dk',
+              country_code: 'ZA',
               type: 'country',
             },
           ],
@@ -344,23 +326,19 @@ export default async function seedDemoData({ container }: ExecArgs) {
   await createShippingOptionsWorkflow(container).run({
     input: [
       {
-        name: 'Denmark Store Pickup',
+        name: 'JHB Store Pickup',
         price_type: 'flat',
         provider_id: 'manual_manual',
         service_zone_id: pickupFulfillmentSet.service_zones[0].id,
         shipping_profile_id: shippingProfile.id,
         type: {
-          label: 'Denmark Store Pickup',
+          label: 'JHB Store Pickup',
           description: 'Free in-store pickup.',
           code: 'standard',
         },
         prices: [
           {
-            currency_code: 'usd',
-            amount: 0,
-          },
-          {
-            currency_code: 'eur',
+            currency_code: 'zar',
             amount: 0,
           },
           {
@@ -426,15 +404,23 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       product_categories: [
         {
-          name: 'One seater',
+          name: 'Straight Hair',
           is_active: true,
         },
         {
-          name: 'Two seater',
+          name: 'Curly Hair',
           is_active: true,
         },
         {
-          name: 'Three seater',
+          name: 'Wavy Hair',
+          is_active: true,
+        },
+        {
+          name: 'Accessories',
+          is_active: true,
+        },
+        {
+          name: 'Hair Care',
           is_active: true,
         },
       ],
@@ -817,70 +803,251 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
     ])
 
   await hairPropsModuleService.createCapSizes([
-    // Velvet
+    //XS
     {
-      name: 'Black',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '8"').id,
     },
     {
-      name: 'Purple',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '10"').id,
     },
-    // Linen
     {
-      name: 'Green',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '12"').id,
     },
     {
-      name: 'Light Gray',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '14"').id,
     },
     {
-      name: 'Yellow',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '16"').id,
     },
     {
-      name: 'Red',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '18"').id,
     },
     {
-      name: 'Blue',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '20"').id,
     },
-    // Microfiber
     {
-      name: 'Orange',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '22"').id,
     },
     {
-      name: 'Dark Gray',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '24"').id,
     },
     {
-      name: 'Black',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '26"').id,
     },
-    // Boucle
     {
-      name: 'Beige',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '28"').id,
     },
     {
-      name: 'White',
+      name: 'Xs',
       product_length_id: productLengths.find((m) => m.name === '30"').id,
     },
+    //sm
     {
-      name: 'Light Gray',
-      product_length_id: productLengths.find((m) => m.name === '32"').id,
-    },
-    // Leather
-    {
-      name: 'Violet',
-      product_length_id: productLengths.find((m) => m.name === '32"').id,
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '8"').id,
     },
     {
-      name: 'Beige',
-      product_length_id: productLengths.find((m) => m.name === '32"').id,
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '10"').id,
+    },
+
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '12"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '14"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '16"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '18"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '20"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '22"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '24"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '26"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '28"').id,
+    },
+    {
+      name: 'Sm',
+      product_length_id: productLengths.find((m) => m.name === '30"').id,
+    },
+    //Medium
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '8"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '10"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '12"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '14"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '16"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '18"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '20"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '22"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '24"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '26"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '28"').id,
+    },
+    {
+      name: 'Md',
+      product_length_id: productLengths.find((m) => m.name === '30"').id,
+    },
+    //Large
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '8"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '10"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '12"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '14"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '16"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '18"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '20"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '22"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '24"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '26"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '28"').id,
+    },
+    {
+      name: 'Lg',
+      product_length_id: productLengths.find((m) => m.name === '30"').id,
+    },
+    //Xl
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '8"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '10"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '12"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '14"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '16"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '18"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '20"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '22"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '24"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '26"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '28"').id,
+    },
+    {
+      name: 'Xl',
+      product_length_id: productLengths.find((m) => m.name === '30"').id,
     },
   ])
 
@@ -918,7 +1085,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           description:
             'The Astrid Curve combines flowing curves and cozy, textured fabric for a truly bohemian vibe. Its relaxed design adds character and comfort, perfect for eclectic living spaces with a free-spirited charm.',
           category_ids: [
-            categoryResult.find((cat) => cat.name === 'Three seater').id,
+            categoryResult.find((cat) => cat.name === 'Curly Hair').id,
           ],
           collection_id: collections.find((c) => c.handle === 'boho-chic').id,
           type_id: productTypes.find((pt) => pt.value === 'Sofas').id,

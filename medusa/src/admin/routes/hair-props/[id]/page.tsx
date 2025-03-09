@@ -24,12 +24,12 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 
-import type { MaterialModelType } from '../../../../modules/hair-props/models/product-length'
-import { ColorModelType } from '../../../../modules/hair-props/models/cap-size'
-import { useCreateColorMutation } from '../../../hooks/fashion'
+import type { ProductLengthModelType } from '../../../../modules/hair-props/models/product-length'
+import { CapSizeModelType } from '../../../../modules/hair-props/models/cap-size'
+import { useCreateCapSizeMutation } from '../../../hooks/hair-props'
 import { Form } from '../../../components/Form/Form'
 import { InputField } from '../../../components/Form/InputField'
-import { EditMaterialDrawer } from '../../../components/EditMaterialDrawer'
+import { EditProductLengthDrawer } from '../../../components/EditProductLengthDrawer'
 import { withQueryClient } from '../../../components/QueryClientProvider'
 
 const colorFormSchema = z.object({
@@ -37,18 +37,18 @@ const colorFormSchema = z.object({
   hex_code: z.string().min(7).max(7),
 })
 
-const EditColorDrawer: React.FC<{
-  materialId: string
+const EditCapSizeDrawer: React.FC<{
+  productLengthId: string
   id: string
   initialValues: z.infer<typeof colorFormSchema>
   children: React.ReactNode
-}> = ({ materialId, id, initialValues, children }) => {
+}> = ({ productLengthId, id, initialValues, children }) => {
   const queryClient = useQueryClient()
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false)
-  const updateColorMutation = useMutation({
-    mutationKey: ['fashion', materialId, 'colors', id, 'update'],
+  const updateCapSizeMutation = useMutation({
+    mutationKey: ['hair-props', productLengthId, 'cap-sizes', id, 'update'],
     mutationFn: async (values: z.infer<typeof colorFormSchema>) => {
-      return fetch(`/admin/fashion/${materialId}/colors/${id}`, {
+      return fetch(`/admin/hair-props/${productLengthId}/cap-sizes/${id}`, {
         method: 'POST',
         body: JSON.stringify(values),
         credentials: 'include',
@@ -56,7 +56,7 @@ const EditColorDrawer: React.FC<{
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
+        predicate: (query) => query.queryKey[0] === 'hair-props',
       })
     },
   })
@@ -66,17 +66,17 @@ const EditColorDrawer: React.FC<{
       <Drawer.Trigger asChild>{children}</Drawer.Trigger>
       <Drawer.Content>
         <Drawer.Header>
-          <Drawer.Title>Edit Color</Drawer.Title>
+          <Drawer.Title>Edit Cap Size</Drawer.Title>
         </Drawer.Header>
         <Drawer.Body>
           <Form
             schema={colorFormSchema}
             onSubmit={async (values) => {
-              await updateColorMutation.mutateAsync(values)
+              await updateCapSizeMutation.mutateAsync(values)
               setIsDrawerOpen(false)
             }}
             formProps={{
-              id: `edit-color-${id}-form`,
+              id: `edit-cap-size-${id}-form`,
             }}
             defaultValues={initialValues}
           >
@@ -99,8 +99,8 @@ const EditColorDrawer: React.FC<{
           </Drawer.Close>
           <Button
             type="submit"
-            form={`edit-color-${id}-form`}
-            isLoading={updateColorMutation.isPending}
+            form={`edit-cap-size-${id}-form`}
+            isLoading={updateCapSizeMutation.isPending}
           >
             Update
           </Button>
@@ -110,25 +110,25 @@ const EditColorDrawer: React.FC<{
   )
 }
 
-const DeleteColorPrompt: React.FC<{
-  materialId: string
+const DeleteCapSizePrompt: React.FC<{
+  productLengthId: string
   id: string
   name: string
   children: React.ReactNode
-}> = ({ materialId, name, id, children }) => {
+}> = ({ productLengthId, name, id, children }) => {
   const queryClient = useQueryClient()
   const [isPromptOpen, setIsPromptOpen] = React.useState(false)
-  const deleteColorMutation = useMutation({
-    mutationKey: ['fashion', materialId, 'colors', id, 'delete'],
+  const deleteCapSizeMutation = useMutation({
+    mutationKey: ['hair-props', productLengthId, 'cap-sizes', id, 'delete'],
     mutationFn: async () => {
-      return fetch(`/admin/fashion/${materialId}/colors/${id}`, {
+      return fetch(`/admin/hair-props/${productLengthId}/cap-sizes/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       }).then((res) => res.json())
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
+        predicate: (query) => query.queryKey[0] === 'hair-props',
       })
 
       setIsPromptOpen(false)
@@ -140,16 +140,16 @@ const DeleteColorPrompt: React.FC<{
       <Prompt.Trigger asChild>{children}</Prompt.Trigger>
       <Prompt.Content>
         <Prompt.Header>
-          <Prompt.Title>Delete {name} color?</Prompt.Title>
+          <Prompt.Title>Delete {name} cap size?</Prompt.Title>
           <Prompt.Description>
-            Are you sure you want to delete the color {name}?
+            Are you sure you want to delete the cap size {name}?
           </Prompt.Description>
         </Prompt.Header>
         <Prompt.Footer>
           <Prompt.Cancel>Cancel</Prompt.Cancel>
           <Prompt.Action
             onClick={() => {
-              deleteColorMutation.mutate()
+              deleteCapSizeMutation.mutate()
             }}
           >
             Delete
@@ -160,25 +160,28 @@ const DeleteColorPrompt: React.FC<{
   )
 }
 
-const RestoreColorPrompt: React.FC<{
-  materialId: string
+const RestoreCapSizePrompt: React.FC<{
+  productLengthId: string
   id: string
   name: string
   children: React.ReactNode
-}> = ({ materialId, name, id, children }) => {
+}> = ({ productLengthId, name, id, children }) => {
   const queryClient = useQueryClient()
   const [isPromptOpen, setIsPromptOpen] = React.useState(false)
-  const restoreColorMutation = useMutation({
-    mutationKey: ['fashion', materialId, 'colors', id, 'restore'],
+  const restoreCapSizeMutation = useMutation({
+    mutationKey: ['hair-props', productLengthId, 'cap-sizes', id, 'restore'],
     mutationFn: async () => {
-      return fetch(`/admin/fashion/${materialId}/colors/${id}/restore`, {
-        method: 'POST',
-        credentials: 'include',
-      }).then((res) => res.json())
+      return fetch(
+        `/admin/hair-props/${productLengthId}/cap-sizes/${id}/restore`,
+        {
+          method: 'POST',
+          credentials: 'include',
+        }
+      ).then((res) => res.json())
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
+        predicate: (query) => query.queryKey[0] === 'hair-props',
       })
 
       setIsPromptOpen(false)
@@ -194,16 +197,16 @@ const RestoreColorPrompt: React.FC<{
       <Prompt.Trigger asChild>{children}</Prompt.Trigger>
       <Prompt.Content>
         <Prompt.Header>
-          <Prompt.Title>Restore {name} color?</Prompt.Title>
+          <Prompt.Title>Restore {name} cap size?</Prompt.Title>
           <Prompt.Description>
-            Are you sure you want to restore the color {name}?
+            Are you sure you want to restore the cap size {name}?
           </Prompt.Description>
         </Prompt.Header>
         <Prompt.Footer>
           <Prompt.Cancel>Cancel</Prompt.Cancel>
           <Prompt.Action
             onClick={() => {
-              restoreColorMutation.mutate()
+              restoreCapSizeMutation.mutate()
             }}
           >
             Restore
@@ -214,7 +217,9 @@ const RestoreColorPrompt: React.FC<{
   )
 }
 
-const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
+const ProductLengthCapSizes: React.FC<{ productLengthId: string }> = ({
+  productLengthId,
+}) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
   const setPage = React.useCallback(
@@ -249,10 +254,10 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
 
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['fashion', materialId, 'colors', deleted, page],
+    queryKey: ['hair-props', productLengthId, 'cap-sizes', deleted, page],
     queryFn: async () => {
       return fetch(
-        `/admin/fashion/${materialId}/colors?page=${page}${
+        `/admin/hair-props/${productLengthId}/cap-sizes?page=${page}${
           deleted ? '&deleted=true' : ''
         }`,
         {
@@ -261,7 +266,7 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
       ).then(
         (res) =>
           res.json() as Promise<{
-            colors: ColorModelType[]
+            cap_sizes: CapSizeModelType[]
             count: number
             page: number
             last_page: number
@@ -270,12 +275,12 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
     },
   })
 
-  const createColorMutation = useCreateColorMutation(materialId)
+  const createCapSizeMutation = useCreateCapSizeMutation(productLengthId)
 
   return (
     <div className="-px-6">
-      <div className="px-6 flex flex-row gap-6 justify-between items-center mb-4">
-        <Heading level="h2">Colors</Heading>
+      <div className="flex flex-row items-center justify-between gap-6 px-6 mb-4">
+        <Heading level="h2">Cap Sizes</Heading>
         <div className="flex flex-row gap-4">
           <div className="flex items-center gap-x-2">
             <Switch
@@ -301,11 +306,11 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
                 <Form
                   schema={colorFormSchema}
                   onSubmit={async (values) => {
-                    await createColorMutation.mutateAsync(values)
+                    await createCapSizeMutation.mutateAsync(values)
                     setIsCreateModalOpen(false)
                   }}
                   formProps={{
-                    id: 'create-color-form',
+                    id: 'create-cap-size-form',
                   }}
                 >
                   <div className="flex flex-col gap-4">
@@ -327,8 +332,8 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
                 </Drawer.Close>
                 <Button
                   type="submit"
-                  form="create-color-form"
-                  isLoading={createColorMutation.isPending}
+                  form="create-cap-size-form"
+                  isLoading={createCapSizeMutation.isPending}
                 >
                   Create
                 </Button>
@@ -362,26 +367,26 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
               </Table.Cell>
             </Table.Row>
           )}
-          {isSuccess && data.colors.length === 0 && (
+          {isSuccess && data.cap_sizes.length === 0 && (
             <Table.Row>
               {/* @ts-ignore */}
               <Table.Cell colSpan={3}>
-                <Text>No colors found</Text>
+                <Text>No cap sizes found</Text>
               </Table.Cell>
             </Table.Row>
           )}
           {isSuccess &&
-            data.colors.length > 0 &&
-            data.colors.map((color) => (
-              <Table.Row key={color.id}>
-                <Table.Cell>{color.name}</Table.Cell>
+            data.cap_sizes.length > 0 &&
+            data.cap_sizes.map((cap_size) => (
+              <Table.Row key={cap_size.id}>
+                <Table.Cell>{cap_size.name}</Table.Cell>
                 <Table.Cell>
-                  <Kbd className="flex flex-row gap-1 items-center font-mono">
+                  <Kbd className="flex flex-row items-center gap-1 font-mono">
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: `${color.hex_code}` }}
+                      style={{ backgroundColor: `${cap_size.hex_code}` }}
                     />
-                    {color.hex_code}
+                    {cap_size.hex_code}
                   </Kbd>
                 </Table.Cell>
                 <Table.Cell className="text-right">
@@ -393,52 +398,52 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Content>
                       <DropdownMenu.Item asChild>
-                        <EditColorDrawer
-                          materialId={materialId}
-                          id={color.id}
-                          initialValues={color}
+                        <EditCapSizeDrawer
+                          productLengthId={productLengthId}
+                          id={cap_size.id}
+                          initialValues={cap_size}
                         >
                           <Button
                             variant="transparent"
-                            className="flex flex-row gap-2 items-center w-full justify-start"
+                            className="flex flex-row items-center justify-start w-full gap-2"
                           >
                             <PencilSquare className="text-ui-fg-subtle" />
                             Edit
                           </Button>
-                        </EditColorDrawer>
+                        </EditCapSizeDrawer>
                       </DropdownMenu.Item>
                       <DropdownMenu.Separator />
-                      {color.deleted_at ? (
+                      {cap_size.deleted_at ? (
                         <DropdownMenu.Item asChild>
-                          <RestoreColorPrompt
-                            materialId={materialId}
-                            id={color.id}
-                            name={color.name}
+                          <RestoreCapSizePrompt
+                            productLengthId={productLengthId}
+                            id={cap_size.id}
+                            name={cap_size.name}
                           >
                             <Button
                               variant="transparent"
-                              className="flex flex-row gap-2 items-center w-full justify-start"
+                              className="flex flex-row items-center justify-start w-full gap-2"
                             >
                               <ArrowPath className="text-ui-fg-subtle" />
                               Restore
                             </Button>
-                          </RestoreColorPrompt>
+                          </RestoreCapSizePrompt>
                         </DropdownMenu.Item>
                       ) : (
                         <DropdownMenu.Item asChild>
-                          <DeleteColorPrompt
-                            materialId={materialId}
-                            id={color.id}
-                            name={color.name}
+                          <DeleteCapSizePrompt
+                            productLengthId={productLengthId}
+                            id={cap_size.id}
+                            name={cap_size.name}
                           >
                             <Button
                               variant="transparent"
-                              className="flex flex-row gap-2 items-center w-full justify-start"
+                              className="flex flex-row items-center justify-start w-full gap-2"
                             >
                               <Trash className="text-ui-fg-subtle" />
                               Delete
                             </Button>
-                          </DeleteColorPrompt>
+                          </DeleteCapSizePrompt>
                         </DropdownMenu.Item>
                       )}
                     </DropdownMenu.Content>
@@ -466,12 +471,12 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
 const MaterialPage = () => {
   const { id } = useParams()
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['fashion', id],
+    queryKey: ['hair-props', id],
     queryFn: async () => {
-      const res = await fetch(`/admin/fashion/${id}`, {
+      const res = await fetch(`/admin/hair-props/${id}`, {
         credentials: 'include',
       })
-      return res.json() as Promise<MaterialModelType>
+      return res.json() as Promise<ProductLengthModelType>
     },
   })
 
@@ -485,20 +490,20 @@ const MaterialPage = () => {
       {isError && <Text>Error loading material</Text>}
       {isSuccess && (
         <>
-          <div className="px-6 flex flex-row gap-6 justify-between items-center mb-4">
+          <div className="flex flex-row items-center justify-between gap-6 px-6 mb-4">
             <div className="flex flex-row gap-3">
               <Heading level="h2">{data?.name}</Heading>
-              <EditMaterialDrawer id={id} initialValues={data}>
+              <EditProductLengthDrawer id={id} initialValues={data}>
                 <IconButton size="xsmall" variant="transparent">
                   <PencilSquare />
                 </IconButton>
-              </EditMaterialDrawer>
+              </EditProductLengthDrawer>
             </div>
           </div>
         </>
       )}
       <hr className="mb-6" />
-      <MaterialColors materialId={id} />
+      <ProductLengthCapSizes productLengthId={id} />
     </Container>
   )
 }
