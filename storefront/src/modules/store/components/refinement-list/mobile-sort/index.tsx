@@ -1,37 +1,37 @@
 import * as React from "react"
+import * as ReactAria from "react-aria-components"
+import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import {
-  Dialog,
-  DialogTrigger,
-  Label,
-  Modal,
-  ModalOverlay,
-  RadioGroup,
-} from "react-aria-components"
-
+  UiRadio,
+  UiRadioBox,
+  UiRadioGroup,
+  UiRadioLabel,
+} from "@/components/ui/Radio"
+import { UiModal, UiModalOverlay } from "@/components/ui/Modal"
 import { Button } from "@/components/Button"
-import { UiRadio, UiRadioBox, UiRadioLabel } from "@/components/ui/Radio"
-import type { SortOptions } from "../sort-products"
+import { UiDialog, UiDialogTrigger } from "@/components/Dialog"
 
 export const MobileSort: React.FC<{
   sortBy: SortOptions | undefined
   setQueryParams: (name: string, value: SortOptions) => void
 }> = ({ sortBy, setQueryParams }) => {
   return (
-    <DialogTrigger>
+    <UiDialogTrigger>
       <Button
+        size="sm"
         variant="outline"
         iconName="chevron-down"
         iconPosition="end"
-        className="bg-white md:hidden border px-4 hover:bg-white border-grayscale-200 h-8 text-black text-xs"
+        className="md:hidden border-grayscale-200"
       >
         Sort by
       </Button>
-      <ModalOverlay
-        isDismissable
-        className="fixed top-0 left-0 w-full h-full bg-black-10%"
-      >
-        <Modal className="bg-white absolute bottom-0 left-0 w-full max-h-full overflow-y-scroll p-6 pb-21">
-          <Dialog className="focus-visible:outline-none">
+      <UiModalOverlay className="p-0">
+        <UiModal
+          animateFrom="bottom"
+          className="w-full rounded-none max-w-full shadow-none pb-21"
+        >
+          <UiDialog>
             {({ close }) => (
               <form
                 onSubmit={(event) => {
@@ -44,15 +44,15 @@ export const MobileSort: React.FC<{
                   close()
                 }}
               >
-                <RadioGroup
+                <UiRadioGroup
                   className="flex flex-col mb-5"
                   name="sortBy"
                   defaultValue={sortBy}
                   aria-label="Sort by"
                 >
-                  <Label className="block text-md font-semibold mb-3">
+                  <ReactAria.Label className="block text-md font-semibold mb-3">
                     Sort by
-                  </Label>
+                  </ReactAria.Label>
                   <UiRadio value="created_at" className="justify-between py-3">
                     <UiRadioLabel>Latest Arrivals</UiRadioLabel>
                     <UiRadioBox />
@@ -65,7 +65,7 @@ export const MobileSort: React.FC<{
                     <UiRadioLabel>Highest price</UiRadioLabel>
                     <UiRadioBox />
                   </UiRadio>
-                </RadioGroup>
+                </UiRadioGroup>
                 <footer className="flex items-center h-21 fixed bottom-0 left-0 w-full bg-white px-6 border-t border-grayscale-100">
                   <Button type="submit" isFullWidth>
                     Show results
@@ -73,9 +73,9 @@ export const MobileSort: React.FC<{
                 </footer>
               </form>
             )}
-          </Dialog>
-        </Modal>
-      </ModalOverlay>
-    </DialogTrigger>
+          </UiDialog>
+        </UiModal>
+      </UiModalOverlay>
+    </UiDialogTrigger>
   )
 }

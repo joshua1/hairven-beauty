@@ -36,7 +36,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
           className={clx('block mb-1', labelProps?.className)}
         >
           {label}
-          {isRequired ? <span className="text-red-500">*</span> : ''}
+          {isRequired ? <span className="text-red-primary">*</span> : ''}
         </Label>
       )}
       <Select
@@ -54,7 +54,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         {children}
       </Select>
       {fieldState.error && (
-        <div className="text-red-500 text-sm mt-1">
+        <div className="text-red-primary text-sm mt-1">
           {fieldState.error.message}
         </div>
       )}

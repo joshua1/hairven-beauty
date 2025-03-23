@@ -1,6 +1,11 @@
+import { Metadata } from "next"
 import { StoreRegion } from "@medusajs/types"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { listRegions } from "@lib/data/regions"
+
+export const metadata: Metadata = {
+  title: "Cookie Policy",
+}
 
 export async function generateStaticParams() {
   const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
@@ -25,12 +30,14 @@ export async function generateStaticParams() {
 
 export default function CookiePolicyPage() {
   return (
-    <Layout className="pt-47 pb-32">
+    <Layout className="pt-30 pb-20 md:pt-47 md:pb-32">
       <LayoutColumn
         start={{ base: 1, lg: 2, xl: 3 }}
         end={{ base: 13, lg: 11, xl: 10 }}
       >
-        <h1 className="text-2xl mb-25">Cookie Policy for Sofa Society</h1>
+        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">
+          Cookie Policy for Sofa Society
+        </h1>
       </LayoutColumn>
       <LayoutColumn
         start={{ base: 1, lg: 2, xl: 3 }}

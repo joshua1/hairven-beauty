@@ -1,35 +1,21 @@
 import { HttpTypes } from "@medusajs/types"
-
-import { getProductsById } from "@lib/data/products"
-import { getProductPrice } from "@lib/util/get-product-price"
 import { LocalizedLink } from "@/components/LocalizedLink"
-import Thumbnail from "../thumbnail"
+import Thumbnail from "@modules/products/components/thumbnail"
+import { getProductPrice } from "@lib/util/get-product-price"
 
-export default async function ProductPreview({
+export default function ProductPreview({
   product,
-  isFeatured,
-  region,
 }: {
   product: HttpTypes.StoreProduct
-  isFeatured?: boolean
-  region: HttpTypes.StoreRegion
 }) {
-  const [pricedProduct] = await getProductsById({
-    ids: [product.id!],
-    regionId: region.id,
-  })
-
-  if (!pricedProduct) {
-    return null
-  }
-
   const { cheapestPrice } = getProductPrice({
-    product: pricedProduct,
+    product: product,
   })
 
   const hasReducedPrice =
     cheapestPrice &&
-    cheapestPrice.calculated_price_number < cheapestPrice.original_price_number
+    cheapestPrice.calculated_price_number <
+      (cheapestPrice?.original_price_number || 0)
 
   return (
     <LocalizedLink href={`/products/${product.handle}`}>

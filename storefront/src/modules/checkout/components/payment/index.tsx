@@ -2,28 +2,36 @@
 
 import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import ErrorMessage from "@modules/checkout/components/error-message"
 import { CreditCard } from "@medusajs/icons"
 import { CardElement } from "@stripe/react-stripe-js"
-import { StripeCardElementOptions } from "@stripe/stripe-js"
-import { RadioGroup } from "react-aria-components"
+import { PaymentMethod, StripeCardElementOptions } from "@stripe/stripe-js"
 import { twJoin } from "tailwind-merge"
+import { HttpTypes } from "@medusajs/types"
+import { capitalize } from "lodash"
 
 import { isStripe as isStripeFunc, paymentInfoMap } from "@lib/constants"
-import { initiatePaymentSession } from "@lib/data/cart"
+import { setPaymentMethod } from "@lib/data/cart"
+
 import PaymentContainer from "@modules/checkout/components/payment-container"
 import { StripeContext } from "@modules/checkout/components/payment-wrapper"
+import ErrorMessage from "@modules/checkout/components/error-message"
+import PaymentCardButton from "@modules/checkout/components/payment-card-button"
+
 import { Button } from "@/components/Button"
+import { UiRadioGroup } from "@/components/ui/Radio"
+import { Input } from "@/components/Forms"
 
 const Payment = ({
   cart,
   availablePaymentMethods,
+  paymentMethod,
 }: {
-  cart: any
-  availablePaymentMethods: any[]
+  cart: HttpTypes.StoreCart
+  availablePaymentMethods: HttpTypes.StorePaymentProvider[]
+  paymentMethod: PaymentMethod | null
 }) => {
   const activeSession = cart.payment_collection?.payment_sessions?.find(
-    (paymentSession: any) => paymentSession.status === "pending"
+    (paymentSession) => paymentSession.status === "pending"
   )
 
   const [isLoading, setIsLoading] = useState(false)
@@ -43,25 +51,26 @@ const Payment = ({
   const isStripe = isStripeFunc(activeSession?.provider_id)
   const stripeReady = useContext(StripeContext)
 
-  const paidByGiftcard =
-    cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
+  // const paidByGiftcard =
+  //   cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
 
   const paymentReady =
-    (activeSession && cart?.shipping_methods.length !== 0) || paidByGiftcard
+    activeSession && cart.shipping_methods && cart.shipping_methods.length !== 0
 
   const useOptions: StripeCardElementOptions = useMemo(() => {
     return {
       style: {
         base: {
           fontFamily: "Inter, sans-serif",
-          color: "#424270",
+          color: "#050505",
           "::placeholder": {
-            color: "rgb(107 114 128)",
+            color: "#808080",
           },
+          fontSize: "16px",
         },
       },
       classes: {
-        base: "pt-3 pb-1 block w-full h-11 px-4 mt-0 bg-ui-bg-field border rounded-md appearance-none focus:outline-none focus:ring-0 focus:shadow-borders-interactive-with-active border-ui-border-base hover:bg-ui-bg-field-hover transition-all duration-300 ease-in-out",
+        base: "pt-[18px] pb-1 block w-full h-14.5 px-4 mt-0 border rounded-xs appearance-none focus:outline-none focus:ring-0 border-grayscale-200 hover:border-grayscale-500 focus:border-grayscale-500 transition-all ease-in-out",
       },
     }
   }, [])
@@ -82,38 +91,35 @@ const Payment = ({
     })
   }
 
-  const handleSubmit = async () => {
-    setIsLoading(true)
-    try {
-      const shouldInputCard =
-        isStripeFunc(selectedPaymentMethod) && !activeSession
-
-      if (!activeSession) {
-        await initiatePaymentSession(selectedPaymentMethod)
-      }
-
-      if (!shouldInputCard) {
-        return router.push(
-          pathname + "?" + createQueryString("step", "review"),
-          {
-            scroll: false,
-          }
-        )
-      }
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   useEffect(() => {
     setError(null)
   }, [isOpen])
 
+  const handleRemoveCard = useCallback(async () => {
+    if (!activeSession?.id) {
+      return
+    }
+
+    try {
+      await setPaymentMethod(activeSession.id, null)
+      setCardBrand(null)
+      setCardComplete(false)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      setError("Failed to remove card")
+    }
+  }, [activeSession?.id])
+
+  useEffect(() => {
+    if (paymentMethod) {
+      setCardBrand(capitalize(paymentMethod?.card?.brand))
+      setCardComplete(true)
+    }
+  }, [paymentMethod])
+
   return (
     <>
-      <div className="flex justify-between mb-8 border-t border-grayscale-200 pt-8 mt-8">
+      <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
           <p
             className={twJoin(
@@ -131,16 +137,16 @@ const Payment = ({
         )}
       </div>
       <div className={isOpen ? "block" : "hidden"}>
-        {!paidByGiftcard && availablePaymentMethods?.length && (
+        {availablePaymentMethods.length && (
           <>
-            <RadioGroup
+            <UiRadioGroup
               value={selectedPaymentMethod}
               onChange={setSelectedPaymentMethod}
               aria-label="Payment methods"
             >
               {availablePaymentMethods
                 .sort((a, b) => {
-                  return a.provider_id > b.provider_id ? 1 : -1
+                  return a.id > b.id ? 1 : -1
                 })
                 .map((paymentMethod) => {
                   return (
@@ -151,69 +157,80 @@ const Payment = ({
                     />
                   )
                 })}
-            </RadioGroup>
+            </UiRadioGroup>
             {isStripe && stripeReady && (
               <div className="mt-5">
-                <p className=" mb-1">Enter your card details:</p>
-
-                <CardElement
-                  options={useOptions as StripeCardElementOptions}
-                  onChange={(e) => {
-                    setCardBrand(
-                      e.brand &&
-                        e.brand.charAt(0).toUpperCase() + e.brand.slice(1)
-                    )
-                    setError(e.error?.message || null)
-                    setCardComplete(e.complete)
-                  }}
-                />
+                {isStripeFunc(selectedPaymentMethod) &&
+                  (paymentMethod?.card?.brand ? (
+                    <Input
+                      value={"**** **** **** " + paymentMethod?.card.last4}
+                      placeholder="Card number"
+                      disabled={true}
+                    />
+                  ) : (
+                    <CardElement
+                      options={useOptions as StripeCardElementOptions}
+                      onChange={(e) => {
+                        setCardBrand(
+                          e.brand &&
+                            e.brand.charAt(0).toUpperCase() + e.brand.slice(1)
+                        )
+                        setError(e.error?.message || null)
+                        setCardComplete(e.complete)
+                      }}
+                    />
+                  ))}
               </div>
             )}
           </>
         )}
 
-        {paidByGiftcard && (
+        {/* {paidByGiftcard && (
           <div className="flex gap-10">
             <div className="text-grayscale-500">Payment method</div>
             <div>Gift card</div>
           </div>
-        )}
-
+        )} */}
         <ErrorMessage
           error={error}
           data-testid="payment-method-error-message"
         />
-
-        <Button
-          className="mt-6"
-          onPress={handleSubmit}
+        {paymentMethod && isStripeFunc(selectedPaymentMethod) && (
+          <Button
+            className="mt-6 mr-6"
+            onPress={handleRemoveCard}
+            isLoading={isLoading}
+            isDisabled={!cardComplete}
+            data-testid="submit-payment-button"
+          >
+            Change card
+          </Button>
+        )}
+        <PaymentCardButton
+          setError={setError}
           isLoading={isLoading}
-          disabled={
-            (isStripe && !cardComplete) ||
-            (!selectedPaymentMethod && !paidByGiftcard)
-          }
-          data-testid="submit-payment-button"
-        >
-          {!activeSession && isStripeFunc(selectedPaymentMethod)
-            ? " Enter card details"
-            : "Continue to review"}
-        </Button>
+          setIsLoading={setIsLoading}
+          selectedPaymentMethod={selectedPaymentMethod}
+          createQueryString={createQueryString}
+          cart={cart}
+          cardComplete={cardComplete}
+        />
       </div>
 
       <div className={isOpen ? "hidden" : "block"}>
         {cart && paymentReady && activeSession ? (
           <div className="flex flex-col gap-4">
-            <div className="flex gap-10">
+            <div className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-12">
               <div className="text-grayscale-500">Payment method</div>
-              <div>
+              <div className="text-grayscale-600">
                 {paymentInfoMap[selectedPaymentMethod]?.title ||
                   selectedPaymentMethod}
               </div>
             </div>
-            <div className="flex gap-10">
+            <div className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-14.5">
               <div className="text-grayscale-500">Payment details</div>
               {isStripeFunc(selectedPaymentMethod) && cardBrand ? (
-                <div className="flex items-center gap-2">
+                <div className="text-grayscale-600 flex items-center gap-2">
                   {paymentInfoMap[selectedPaymentMethod]?.icon || (
                     <CreditCard />
                   )}
@@ -225,12 +242,12 @@ const Payment = ({
                 </div>
               )}
             </div>
-          </div>
-        ) : paidByGiftcard ? (
+          </div> /* : paidByGiftcard ? (
           <div className="flex gap-10">
             <div className="text-grayscale-500">Payment method</div>
             <div>Gift card</div>
           </div>
+        ) */
         ) : null}
       </div>
     </>

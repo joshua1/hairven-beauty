@@ -1,12 +1,9 @@
 "use client"
 
-// External packages
 import * as React from "react"
 import { twJoin, twMerge } from "tailwind-merge"
 import { EmblaCarouselType } from "embla-carousel"
 import useEmblaCarousel from "embla-carousel-react"
-
-// Components
 import { Icon } from "@/components/Icon"
 import { IconCircle } from "@/components/IconCircle"
 import { Layout, LayoutColumn } from "@/components/Layout"
@@ -57,14 +54,10 @@ export const Carousel: React.FC<CarouselProps> = ({
     <div className={twMerge("overflow-hidden", className)}>
       <Layout>
         <LayoutColumn className="relative">
-          <div
-            className={twJoin(
-              "mb-8 md:mb-15 flex flex-wrap justify-between items-center gap-x-10 gap-y-2"
-            )}
-          >
+          <div className="mb-8 md:mb-15 flex max-sm:flex-col justify-between sm:items-center gap-x-10 gap-y-6">
             {heading}
             {(arrows || button) && (
-              <div className={twJoin("flex md:gap-6")}>
+              <div className="flex md:gap-6 shrink-0">
                 {button}
                 {arrows && (
                   <div className="flex gap-2">
@@ -76,6 +69,7 @@ export const Carousel: React.FC<CarouselProps> = ({
                         "max-md:hidden transition-opacity",
                         prevBtnDisabled && "opacity-50"
                       )}
+                      aria-label="Previous"
                     >
                       <IconCircle>
                         <Icon
@@ -92,6 +86,7 @@ export const Carousel: React.FC<CarouselProps> = ({
                         "max-md:hidden transition-opacity",
                         nextBtnDisabled && "opacity-50"
                       )}
+                      aria-label="Next"
                     >
                       <IconCircle>
                         <Icon
@@ -106,9 +101,7 @@ export const Carousel: React.FC<CarouselProps> = ({
             )}
           </div>
           <div ref={emblaRef}>
-            <div className={twJoin("flex touch-pan-y gap-4 md:gap-10")}>
-              {children}
-            </div>
+            <div className="flex touch-pan-y gap-4 md:gap-10">{children}</div>
           </div>
         </LayoutColumn>
       </Layout>

@@ -1,4 +1,4 @@
-import Product from "../product-preview"
+import Product from "@modules/products/components/product-preview"
 import { getRegion } from "@lib/data/regions"
 import { getProductsList } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
@@ -51,7 +51,7 @@ export default async function RelatedProducts({
     <>
       <Layout>
         <LayoutColumn className="mt-26 md:mt-36">
-          <h4 className="text-lg md:text-2xl mb-8 md:mb-16">
+          <h4 className="text-md md:text-2xl mb-8 md:mb-16">
             Related products
           </h4>
         </LayoutColumn>
@@ -59,7 +59,7 @@ export default async function RelatedProducts({
       <Layout className="gap-y-10 md:gap-y-16">
         {products.map((product) => (
           <LayoutColumn key={product.id} className="!col-span-6 md:!col-span-4">
-            <Product region={region} product={product} />
+            <Product product={product} />
           </LayoutColumn>
         ))}
       </Layout>

@@ -78,7 +78,7 @@ export const ImageField: React.FC<ImageFieldProps> = ({
       {typeof label !== 'undefined' && (
         <Label htmlFor={name} className="block mb-1">
           {label}
-          {isRequired ? <span className="text-red-500">*</span> : ''}
+          {isRequired ? <span className="text-red-primary">*</span> : ''}
         </Label>
       )}
       <div
@@ -130,7 +130,7 @@ export const ImageField: React.FC<ImageFieldProps> = ({
         </div>
       )}
       {fieldState.error && (
-        <div className="text-red-500 text-sm mt-1">
+        <div className="text-red-primary text-sm mt-1">
           {fieldState.error.message}
         </div>
       )}

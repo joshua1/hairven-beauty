@@ -4,12 +4,18 @@ import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
+import { PaymentMethod } from "@stripe/stripe-js"
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { enrichLineItems } from "@lib/util/enrich-line-items"
-import { getAuthHeaders, getCartId, removeCartId, setCartId } from "./cookies"
-import { getRegion } from "./regions"
+import {
+  getCartId,
+  getAuthHeaders,
+  setCartId,
+  removeCartId,
+} from "@lib/data/cookies"
+import { getRegion } from "@lib/data/regions"
 
 export async function retrieveCart() {
   const cartId = await getCartId()
@@ -67,6 +73,7 @@ export async function getOrSetCart(input: unknown) {
       await getAuthHeaders()
     )
     cart = cartResp.cart
+
     await setCartId(cart.id)
     revalidateTag("cart")
   }
@@ -224,6 +231,31 @@ export async function setShippingMethod({
     .catch(medusaError)
 }
 
+export async function setPaymentMethod(
+  session_id: string,
+  token: string | null | undefined
+) {
+  await sdk.client
+    .fetch("/store/custom/stripe/set-payment-method", {
+      method: "POST",
+      body: { session_id, token },
+    })
+    .then((resp) => {
+      revalidateTag("cart")
+      return resp
+    })
+    .catch(medusaError)
+}
+
+export async function getPaymentMethod(id: string) {
+  return await sdk.client
+    .fetch<PaymentMethod>(`/store/custom/stripe/get-payment-method/${id}`)
+    .then((resp: PaymentMethod) => {
+      return resp
+    })
+    .catch(medusaError)
+}
+
 export async function initiatePaymentSession(provider_id: unknown) {
   const cart = await retrieveCart()
 
@@ -252,66 +284,58 @@ export async function initiatePaymentSession(provider_id: unknown) {
 }
 
 export async function applyPromotions(codes: string[]) {
-  const validatedData = z.array(z.string()).safeParse(codes)
-
-  if (validatedData.success === false) {
-    throw new Error("Invalid promo codes")
-  }
-
   const cartId = await getCartId()
   if (!cartId) {
     throw new Error("No existing cart found")
   }
 
-  await updateCart({ promo_codes: validatedData.data })
+  await updateCart({ promo_codes: codes })
     .then(() => {
       revalidateTag("cart")
     })
     .catch(medusaError)
 }
 
-export async function setEmail(currentState: unknown, formData: FormData) {
+export async function setEmail(
+  currentState: unknown,
+  { email, country_code }: { email: string; country_code: string }
+) {
   try {
-    if (!formData) {
-      throw new Error("No form data found when setting addresses")
-    }
     const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
-  } catch (e: any) {
-    return e.message
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Could not get your cart",
+    }
   }
 
-  const countryCode = z.string().min(2).safeParse(formData.get("country_code"))
-
+  const countryCode = z.string().min(2).safeParse(country_code)
   if (!countryCode.success) {
-    return "Invalid country code"
+    return { success: false, error: "Invalid country code" }
   }
 
-  const email = z.string().min(3).email().safeParse(formData.get("email"))
+  await updateCart({ email })
 
-  if (!email.success) {
-    return "Invalid email"
-  }
-
-  await updateCart({ email: email.data })
-
-  redirect(`/${countryCode.data}/checkout?step=delivery`)
+  return { success: true, error: null }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const addressesFormSchema = z
   .object({
     shipping_address: z.object({
-      first_name: z.string(),
-      last_name: z.string(),
-      address_1: z.string(),
-      company: z.string(),
-      postal_code: z.string(),
-      city: z.string(),
-      country_code: z.string(),
-      province: z.string(),
-      phone: z.string(),
+      first_name: z.string().min(1),
+      last_name: z.string().min(1),
+      company: z.string().optional(),
+      address_1: z.string().min(1),
+      address_2: z.string().optional(),
+      city: z.string().min(1),
+      postal_code: z.string().min(1),
+      province: z.string().optional(),
+      country_code: z.string().min(2),
+      phone: z.string().optional(),
     }),
   })
   .and(
@@ -322,21 +346,25 @@ const addressesFormSchema = z
       z.object({
         same_as_billing: z.literal("off").optional(),
         billing_address: z.object({
-          first_name: z.string(),
-          last_name: z.string(),
-          address_1: z.string(),
-          company: z.string(),
-          postal_code: z.string(),
-          city: z.string(),
-          country_code: z.string(),
-          province: z.string(),
-          phone: z.string(),
+          first_name: z.string().min(1),
+          last_name: z.string().min(1),
+          company: z.string().optional(),
+          address_1: z.string().min(1),
+          address_2: z.string().optional(),
+          city: z.string().min(1),
+          postal_code: z.string().min(1),
+          province: z.string().optional(),
+          country_code: z.string().min(2),
+          phone: z.string().optional(),
         }),
       }),
     ])
   )
 
-export async function setAddresses(currentState: unknown, formData: FormData) {
+export async function setAddresses(
+  currentState: unknown,
+  formData: z.infer<typeof addressesFormSchema>
+) {
   try {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
@@ -346,46 +374,21 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       throw new Error("No existing cart found when setting addresses")
     }
 
-    const validatedData = addressesFormSchema.parse({
-      shipping_address: {
-        first_name: formData.get("shipping_address.first_name"),
-        last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
-        company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
-        country_code: formData.get("shipping_address.country_code"),
-        province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
-      },
-      same_as_billing: formData.get("same_as_billing"),
-      billing_address: {
-        first_name: formData.get("billing_address.first_name"),
-        last_name: formData.get("billing_address.last_name"),
-        address_1: formData.get("billing_address.address_1"),
-        company: formData.get("billing_address.company"),
-        postal_code: formData.get("billing_address.postal_code"),
-        city: formData.get("billing_address.city"),
-        country_code: formData.get("billing_address.country_code"),
-        province: formData.get("billing_address.province"),
-        phone: formData.get("billing_address.phone"),
-      },
-    })
-
     await updateCart({
-      shipping_address: validatedData.shipping_address,
+      shipping_address: formData.shipping_address,
       billing_address:
-        validatedData.same_as_billing === "on"
-          ? validatedData.shipping_address
-          : validatedData.billing_address,
+        formData.same_as_billing === "on"
+          ? formData.shipping_address
+          : formData.billing_address,
     })
-  } catch (e: any) {
-    return e.message
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Could not set addresses",
+    }
   }
 
-  redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=shipping`
-  )
+  return { success: true, error: null }
 }
 
 export async function placeOrder() {

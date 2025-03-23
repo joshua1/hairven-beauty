@@ -22,7 +22,7 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
   isRequired,
 }) => {
   const { field, fieldState } = useController<{ __name__: string }, '__name__'>(
-    { name: name as '__name__' }
+    { name: name as '__name__' },
   );
 
   return (
@@ -34,7 +34,7 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
           className={clx('block mb-1', labelProps?.className)}
         >
           {label}
-          {isRequired ? <span className="text-red-500">*</span> : ''}
+          {isRequired ? <span className="text-red-primary">*</span> : ''}
         </Label>
       )}
       <Textarea
@@ -45,7 +45,7 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
         aria-invalid={Boolean(fieldState.error)}
       />
       {fieldState.error && (
-        <div className="text-red-500 text-sm mt-1">
+        <div className="text-red-primary text-sm mt-1">
           {fieldState.error.message}
         </div>
       )}

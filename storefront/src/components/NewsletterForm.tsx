@@ -1,12 +1,14 @@
 "use client"
 
-// External components
 import * as React from "react"
-
-// Components
 import { Button } from "@/components/Button"
-import { Input } from "@/components/Forms"
+import { Form, InputField } from "@/components/Forms"
 import { LocalizedLink } from "@/components/LocalizedLink"
+import { z } from "zod"
+
+const newsletterFormSchema = z.object({
+  email: z.string().min(3).email(),
+})
 
 export const NewsletterForm: React.FC<{ className?: string }> = ({
   className,
@@ -25,27 +27,29 @@ export const NewsletterForm: React.FC<{ className?: string }> = ({
           <p className="max-md:text-xs mb-4">
             We will also send you our discount coupons!
           </p>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault()
-
+          <Form
+            onSubmit={() => {
               setIsSubmitted(true)
             }}
+            schema={newsletterFormSchema}
           >
             <div className="flex gap-2">
-              <Input
-                uiSize="sm"
+              <InputField
+                inputProps={{
+                  uiSize: "sm",
+                  className: "rounded-xs",
+                  autoComplete: "email",
+                }}
                 name="email"
                 type="email"
                 placeholder="Your email"
-                wrapperClassName="mb-4 flex-1"
-                className="rounded-xs"
+                className="mb-4 flex-1"
               />
               <Button type="submit" size="sm" className="h-9 text-xs">
                 Subscribe
               </Button>
             </div>
-          </form>
+          </Form>
           <p className="text-xs text-grayscale-500">
             By subscribing you agree to with our{" "}
             <LocalizedLink

@@ -407,7 +407,7 @@ const ProductLengthCapSizes: React.FC<{ productLengthId: string }> = ({
                             variant="transparent"
                             className="flex flex-row items-center justify-start w-full gap-2"
                           >
-                            <PencilSquare className="text-ui-fg-subtle" />
+                            <PencilSquare className="text-fg-subtle dark:text-fg-subtle-dark" />
                             Edit
                           </Button>
                         </EditCapSizeDrawer>
@@ -424,7 +424,7 @@ const ProductLengthCapSizes: React.FC<{ productLengthId: string }> = ({
                               variant="transparent"
                               className="flex flex-row items-center justify-start w-full gap-2"
                             >
-                              <ArrowPath className="text-ui-fg-subtle" />
+                              <ArrowPath className="text-fg-subtle dark:text-fg-subtle-dark" />
                               Restore
                             </Button>
                           </RestoreCapSizePrompt>
@@ -440,7 +440,7 @@ const ProductLengthCapSizes: React.FC<{ productLengthId: string }> = ({
                               variant="transparent"
                               className="flex flex-row items-center justify-start w-full gap-2"
                             >
-                              <Trash className="text-ui-fg-subtle" />
+                              <Trash className="text-fg-subtle dark:text-fg-subtle-dark" />
                               Delete
                             </Button>
                           </DeleteCapSizePrompt>

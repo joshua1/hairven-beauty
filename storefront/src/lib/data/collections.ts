@@ -1,6 +1,6 @@
 import { sdk } from "@lib/config"
 import { cache } from "react"
-import { getProductsList } from "./products"
+import { getProductsList } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
 
 export const retrieveCollection = cache(async function (id: string) {
@@ -61,7 +61,7 @@ export const getCollectionsWithProducts = cache(
           collection.products = []
         }
 
-        collection.products.push(product as any)
+        collection.products.push(product)
       }
     })
 

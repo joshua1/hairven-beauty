@@ -1,6 +1,5 @@
 module.exports = {
   darkMode: "class",
-  presets: [require("@medusajs/ui-preset")],
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx}",
     "./src/pages/**/*.{js,ts,jsx,tsx}",
@@ -12,6 +11,7 @@ module.exports = {
     colors: {
       black: "#050505",
       "black-10%": "rgba(5, 5, 5, 0.1)",
+      "black-30%": "rgba(5, 5, 5, 0.3)",
       white: "#FDFDFD",
       grayscale: {
         800: "#1F1F20",
@@ -33,6 +33,30 @@ module.exports = {
       yellow: "#FFEFB7",
       transparent: "rgba(0,0,0,0)",
       current: "currentColor",
+      "fg-subtle": {
+        DEFAULT: "rgba(82, 82, 91, 1)",
+        dark: "rgba(161, 161, 170, 1)",
+      },
+      "fg-base": {
+        DEFAULT: "rgba(24, 24, 27, 1)",
+        dark: "rgba(244, 244, 245, 1)",
+      },
+      "bg-field": {
+        DEFAULT: "rgba(250, 250, 250, 1)",
+        dark: "rgba(255, 255, 255, 0.04)",
+      },
+      "bg-field-hover": {
+        DEFAULT: "rgba(244, 244, 245, 1)",
+        dark: "rgba(255, 255, 255, 0.08)",
+      },
+      "border-base": {
+        DEFAULT: "rgba(228, 228, 231, 1)",
+        dark: "rgba(255, 255, 255, 0.08)",
+      },
+      "fg-muted": {
+        DEFAULT: "rgba(161, 161, 170, 1)",
+        dark: "rgba(113, 113, 122, 1)",
+      },
     },
     fontSize: {
       "3xl": ["3.5rem", 1.4],
@@ -43,6 +67,7 @@ module.exports = {
       sm: ["1.125rem", 1.4],
       base: ["1rem", 1.4],
       xs: ["0.75rem", 1.4],
+      "2xs": ["0.625rem", 1.4],
     },
     borderRadius: {
       "2xs": "2px",
@@ -50,6 +75,7 @@ module.exports = {
       md: "24px",
       lg: "30px",
       full: "100%",
+      none: "0px",
     },
     screens: {
       xs: "400px",
@@ -57,9 +83,13 @@ module.exports = {
       md: "768px",
       lg: "1024px",
       xl: "1280px",
+      "2xl": "1400px",
     },
     extend: {
       spacing: {
+        6.5: "1.625rem",
+        11.5: "2.875rem",
+        13: "3.25rem",
         13.5: "3.375rem",
         14.5: "3.625rem",
         15: "3.75rem",
@@ -82,12 +112,20 @@ module.exports = {
         37: "9.25rem",
         39: "9.75rem",
         42: "10.5rem",
+        45: "11.25rem",
         46: "11.5rem",
         47: "11.75rem",
         50: "12.5rem",
+        54: "13.5rem",
         61: "15.25rem",
+        65: "16.25rem",
+        66: "16.5rem",
         75: "18.75rem",
         90: "22.5rem",
+        91: "22.75rem",
+        93: "23.25rem",
+        95: "23.75rem",
+        98: "24.5rem",
         100: "25rem",
         108: "27rem",
         120: "30rem",
@@ -95,28 +133,41 @@ module.exports = {
         124: "31rem",
         125: "31.25rem",
         135: "33.75rem",
+        139: "34.75rem",
         150: "37.5rem",
+        154: "38.5rem",
         159: "39.75rem",
+        200: "50rem",
       },
       borderWidth: {
         6: "6px",
       },
+      fontFamily: {
+        inter: [
+          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji",
+        ],
+      },
       transitionProperty: {
         fontWeight: "font-weight",
         padding: "padding",
+        width: "width",
       },
       zIndex: {
         header: "9999",
       },
       keyframes: {
-        shine: {
+        shimmer: {
           "100%": {
             transform: "translateX(100%)",
           },
         },
       },
-      animation: {
-        shine: "shine 1s linear infinite",
+      boxShadow: {
+        modal: "0px 0px 40px -16px rgba(0, 0, 0, 0.20)",
+        "borders-interactive-with-active":
+          "0px 0px 0px 1px rgba(59, 130, 246, 1), 0px 0px 0px 4px rgba(59, 130, 246, 0.2)",
+        "borders-interactive-with-active-dark":
+          "0px 0px 0px 1px rgba(96, 165, 250, 1), 0px 0px 0px 4px rgba(59, 130, 246, 0.25)",
       },
     },
   },
@@ -126,5 +177,5 @@ module.exports = {
       variants: ["xs", "sm", "md", "lg", "xl"],
     },
   ],
-  plugins: [require("tailwindcss-radix")()],
+  plugins: [require("tailwindcss-radix"), require("tailwindcss-animate")],
 }

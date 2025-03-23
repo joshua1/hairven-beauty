@@ -2,7 +2,7 @@
 
 import { OnApproveActions, OnApproveData } from "@paypal/paypal-js"
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js"
-import { useElements, useStripe } from "@stripe/react-stripe-js"
+import { useStripe } from "@stripe/react-stripe-js"
 import React, { useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 
@@ -10,7 +10,7 @@ import Spinner from "@modules/common/icons/spinner"
 import { placeOrder } from "@lib/data/cart"
 import { isManual, isPaypal, isStripe } from "@lib/constants"
 import { Button } from "@/components/Button"
-import ErrorMessage from "../error-message"
+import ErrorMessage from "@modules/checkout/components/error-message"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -59,20 +59,20 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   }
 }
 
-const GiftCardPaymentButton = () => {
-  const [submitting, setSubmitting] = useState(false)
+// const GiftCardPaymentButton = () => {
+//   const [submitting, setSubmitting] = useState(false)
 
-  const handleOrder = async () => {
-    setSubmitting(true)
-    await placeOrder()
-  }
+//   const handleOrder = async () => {
+//     setSubmitting(true)
+//     await placeOrder()
+//   }
 
-  return (
-    <Button onPress={handleOrder} isLoading={submitting} className="w-full">
-      Place order
-    </Button>
-  )
-}
+//   return (
+//     <Button onPress={handleOrder} isLoading={submitting} className="w-full">
+//       Place order
+//     </Button>
+//   )
+// }
 
 const StripePaymentButton = ({
   cart,
@@ -95,44 +95,25 @@ const StripePaymentButton = ({
   }
 
   const stripe = useStripe()
-  const elements = useElements()
-  const card = elements?.getElement("card")
 
   const session = cart.payment_collection?.payment_sessions?.find(
     (s) => s.status === "pending"
   )
 
-  const disabled = !stripe || !elements ? true : false
+  const disabled = !stripe || !session?.data?.payment_method_id ? true : false
 
   const handlePayment = async () => {
     setSubmitting(true)
 
-    if (!stripe || !elements || !card || !cart) {
+    if (!stripe) {
       setSubmitting(false)
       return
     }
+    const paymentMethodId = session?.data?.payment_method_id as string
 
     await stripe
       .confirmCardPayment(session?.data.client_secret as string, {
-        payment_method: {
-          card: card,
-          billing_details: {
-            name:
-              cart.billing_address?.first_name +
-              " " +
-              cart.billing_address?.last_name,
-            address: {
-              city: cart.billing_address?.city ?? undefined,
-              country: cart.billing_address?.country_code ?? undefined,
-              line1: cart.billing_address?.address_1 ?? undefined,
-              line2: cart.billing_address?.address_2 ?? undefined,
-              postal_code: cart.billing_address?.postal_code ?? undefined,
-              state: cart.billing_address?.province ?? undefined,
-            },
-            email: cart.email,
-            phone: cart.billing_address?.phone ?? undefined,
-          },
-        },
+        payment_method: paymentMethodId,
       })
       .then(({ error, paymentIntent }) => {
         if (error) {
@@ -163,7 +144,7 @@ const StripePaymentButton = ({
   return (
     <>
       <Button
-        disabled={disabled || notReady}
+        isDisabled={disabled || notReady}
         onPress={handlePayment}
         isLoading={submitting}
         className="w-full"
@@ -262,7 +243,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   return (
     <>
       <Button
-        disabled={notReady}
+        isDisabled={notReady}
         isLoading={submitting}
         onPress={handlePayment}
         className="w-full"

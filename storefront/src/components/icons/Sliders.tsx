@@ -1,4 +1,3 @@
-// External packages
 import * as React from "react"
 
 export const Sliders: React.FC<React.ComponentPropsWithoutRef<"svg">> = (

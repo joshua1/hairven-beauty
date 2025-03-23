@@ -1,5 +1,4 @@
-// External packages
-import * as React from "react";
+import * as React from "react"
 
 export const Loader: React.FC<React.ComponentPropsWithoutRef<"svg">> = (
   props
@@ -20,4 +19,4 @@ export const Loader: React.FC<React.ComponentPropsWithoutRef<"svg">> = (
       fill="currentColor"
     />
   </svg>
-);
+)

@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import { getCartQuantity } from "@lib/data/cart"
-import { Icon, IconProps } from "./Icon"
+import { Icon, IconProps } from "@/components/Icon"
 
 const CartIconWithQuantity: React.FC<
   Omit<IconProps, "status" | "name">

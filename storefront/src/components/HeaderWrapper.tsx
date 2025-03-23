@@ -18,8 +18,14 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
     currentPath === "/about" ||
     currentPath === "/inspiration" ||
     currentPath.startsWith("/collections")
+  const isAlwaysSticky =
+    currentPath.startsWith("/auth") || currentPath.startsWith("/account")
 
   React.useEffect(() => {
+    if (isAlwaysSticky) {
+      return
+    }
+
     const headerElement = document.querySelector("#site-header")
 
     if (!headerElement) {
@@ -50,9 +56,10 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
     const handleScroll = () => {
       const position = window.scrollY
 
-      position > triggerPosition
-        ? headerElement.setAttribute("data-sticky", "true")
-        : headerElement.setAttribute("data-sticky", "false")
+      headerElement.setAttribute(
+        "data-sticky",
+        position > triggerPosition ? "true" : "false"
+      )
     }
 
     updateTriggerPosition()
@@ -73,14 +80,14 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
       window.removeEventListener("orientationchange", updateTriggerPosition)
       window.removeEventListener("scroll", handleScroll)
     }
-  }, [pathName, isPageWithHeroImage])
+  }, [pathName, isPageWithHeroImage, isAlwaysSticky])
 
   return (
     <div
       id="site-header"
-      className="top-0 left-0 w-full max-md:bg-grayscale-50 data-[light=true]:md:text-white data-[sticky=true]:md:bg-white data-[sticky=true]:md:text-black transition-colors fixed max-md:px-6 z-40 group"
+      className="top-0 left-0 w-full max-md:bg-grayscale-50 data-[light=true]:md:text-white data-[sticky=true]:md:bg-white data-[sticky=true]:md:text-black transition-colors fixed z-40 group"
       data-light={isPageWithHeroImage}
-      data-sticky={false}
+      data-sticky={isAlwaysSticky}
     >
       {children}
     </div>

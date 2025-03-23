@@ -2,6 +2,7 @@ import "server-only"
 import { cookies } from "next/headers"
 
 export const getAuthHeaders = async (): Promise<
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   { authorization: string } | {}
 > => {
   const token = (await cookies()).get("_medusa_jwt")?.value

@@ -1,7 +1,12 @@
+import { Metadata } from "next"
 import { StoreRegion } from "@medusajs/types"
 import { listRegions } from "@lib/data/regions"
 import { Layout, LayoutColumn } from "@/components/Layout"
 
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Learn how we protect your privacy",
+}
 export async function generateStaticParams() {
   const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
     regions.flatMap((r) =>
@@ -25,12 +30,14 @@ export async function generateStaticParams() {
 
 export default function PrivacyPolicyPage() {
   return (
-    <Layout className="pt-47 pb-32">
+    <Layout className="pt-30 pb-20 md:pt-47 md:pb-32">
       <LayoutColumn
         start={{ base: 1, lg: 2, xl: 3 }}
         end={{ base: 13, lg: 11, xl: 10 }}
       >
-        <h1 className="text-2xl mb-25">Privacy Policy for Sofa Society</h1>
+        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">
+          Privacy Policy for Sofa Society
+        </h1>
       </LayoutColumn>
       <LayoutColumn
         start={{ base: 1, lg: 2, xl: 3 }}

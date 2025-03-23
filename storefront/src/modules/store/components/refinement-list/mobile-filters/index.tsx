@@ -1,19 +1,15 @@
-import { Button } from "@/components/Button"
+import * as React from "react"
+import * as ReactAria from "react-aria-components"
+
 import {
   UiCheckbox,
   UiCheckboxBox,
   UiCheckboxIcon,
   UiCheckboxLabel,
 } from "@/components/ui/Checkbox"
-import * as React from "react"
-import {
-  CheckboxGroup,
-  Dialog,
-  DialogTrigger,
-  Label,
-  Modal,
-  ModalOverlay,
-} from "react-aria-components"
+import { Button } from "@/components/Button"
+import { UiModal, UiModalOverlay } from "@/components/ui/Modal"
+import { UiDialog, UiDialogTrigger } from "@/components/Dialog"
 
 export const MobileFilters: React.FC<{
   collections?: Record<string, string>
@@ -33,20 +29,22 @@ export const MobileFilters: React.FC<{
   setMultipleQueryParams,
 }) => {
   return (
-    <DialogTrigger>
+    <UiDialogTrigger>
       <Button
+        size="sm"
+        variant="outline"
         iconName="plus"
         iconPosition="end"
-        className="bg-white md:hidden border px-4 hover:bg-white border-grayscale-200 h-8 text-black text-xs"
+        className="md:hidden border-grayscale-200"
       >
         Filter
       </Button>
-      <ModalOverlay
-        isDismissable
-        className="fixed top-0 left-0 w-full h-full bg-black-10%"
-      >
-        <Modal className="bg-white absolute bottom-0 left-0 w-full max-h-full overflow-y-scroll p-6 pb-21">
-          <Dialog className="focus-visible:outline-none">
+      <UiModalOverlay className="p-0">
+        <UiModal
+          animateFrom="bottom"
+          className="top-36 w-full pb-26 max-w-full"
+        >
+          <UiDialog>
             {({ close }) => (
               <form
                 onSubmit={(event) => {
@@ -72,14 +70,14 @@ export const MobileFilters: React.FC<{
                 }}
               >
                 {collections && Object.keys(collections).length > 0 && (
-                  <CheckboxGroup
+                  <ReactAria.CheckboxGroup
                     className="flex flex-col"
                     name="collection"
                     defaultValue={collection ?? []}
                   >
-                    <Label className="block text-md font-semibold mb-3">
+                    <ReactAria.Label className="block text-md font-semibold mb-3">
                       Collections
-                    </Label>
+                    </ReactAria.Label>
                     {Object.entries(collections).map(([key, value]) => (
                       <UiCheckbox
                         key={key}
@@ -92,23 +90,23 @@ export const MobileFilters: React.FC<{
                         </UiCheckboxBox>
                       </UiCheckbox>
                     ))}
-                  </CheckboxGroup>
+                  </ReactAria.CheckboxGroup>
                 )}
                 {collections &&
                   Object.keys(collections).length > 0 &&
                   ((categories && Object.keys(categories).length > 0) ||
                     (types && Object.keys(types).length > 0)) && (
-                    <hr className="my-6" />
+                    <hr className="my-3 text-grayscale-200" />
                   )}
                 {categories && Object.keys(categories).length > 0 && (
-                  <CheckboxGroup
+                  <ReactAria.CheckboxGroup
                     className="flex flex-col"
                     name="category"
                     defaultValue={category ?? []}
                   >
-                    <Label className="block text-md font-semibold mb-3">
+                    <ReactAria.Label className="block text-md font-semibold mb-3">
                       Categories
-                    </Label>
+                    </ReactAria.Label>
                     {Object.entries(categories).map(([key, value]) => (
                       <UiCheckbox
                         key={key}
@@ -121,21 +119,23 @@ export const MobileFilters: React.FC<{
                         </UiCheckboxBox>
                       </UiCheckbox>
                     ))}
-                  </CheckboxGroup>
+                  </ReactAria.CheckboxGroup>
                 )}
                 {categories &&
                   Object.keys(categories).length > 0 &&
                   types &&
-                  Object.keys(types).length > 0 && <hr className="my-6" />}
+                  Object.keys(types).length > 0 && (
+                    <hr className="my-3 text-grayscale-200" />
+                  )}
                 {types && Object.keys(types).length > 0 && (
-                  <CheckboxGroup
+                  <ReactAria.CheckboxGroup
                     className="flex flex-col"
                     name="type"
                     defaultValue={type ?? []}
                   >
-                    <Label className="block text-md font-semibold mb-3">
+                    <ReactAria.Label className="block text-md font-semibold mb-3">
                       Types
-                    </Label>
+                    </ReactAria.Label>
                     {Object.entries(types).map(([key, value]) => (
                       <UiCheckbox
                         key={key}
@@ -148,7 +148,7 @@ export const MobileFilters: React.FC<{
                         </UiCheckboxBox>
                       </UiCheckbox>
                     ))}
-                  </CheckboxGroup>
+                  </ReactAria.CheckboxGroup>
                 )}
                 <footer className="flex items-center h-21 fixed bottom-0 left-0 w-full bg-white px-6 border-t border-grayscale-100">
                   <Button type="submit" isFullWidth>
@@ -157,9 +157,9 @@ export const MobileFilters: React.FC<{
                 </footer>
               </form>
             )}
-          </Dialog>
-        </Modal>
-      </ModalOverlay>
-    </DialogTrigger>
+          </UiDialog>
+        </UiModal>
+      </UiModalOverlay>
+    </UiDialogTrigger>
   )
 }

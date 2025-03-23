@@ -2,7 +2,7 @@
 
 import { loadStripe } from "@stripe/stripe-js"
 import React from "react"
-import StripeWrapper from "./stripe-wrapper"
+import StripeWrapper from "@modules/checkout/components/payment-wrapper/stripe-wrapper"
 import { PayPalScriptProvider } from "@paypal/react-paypal-js"
 import { createContext } from "react"
 import { HttpTypes } from "@medusajs/types"

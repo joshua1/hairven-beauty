@@ -1,4 +1,3 @@
-// Components
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { Skeleton } from "@/components/ui/Skeleton"
 import SkeletonButton from "@modules/skeletons/components/skeleton-button"

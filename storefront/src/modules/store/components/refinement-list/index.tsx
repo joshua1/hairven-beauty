@@ -4,12 +4,14 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback } from "react"
 
 import { Layout, LayoutColumn } from "@/components/Layout"
-import SortProducts, { SortOptions } from "./sort-products"
-import { CollectionFilter } from "./collection-filter"
-import { CategoryFilter } from "./category-filter"
-import { TypeFilter } from "./type-filter"
-import { MobileFilters } from "./mobile-filters"
-import { MobileSort } from "./mobile-sort"
+import { CategoryFilter } from "@modules/store/components/refinement-list/category-filter"
+import { CollectionFilter } from "@modules/store/components/refinement-list/collection-filter"
+import { MobileFilters } from "@modules/store/components/refinement-list/mobile-filters"
+import { MobileSort } from "@modules/store/components/refinement-list/mobile-sort"
+import SortProducts, {
+  SortOptions,
+} from "@modules/store/components/refinement-list/sort-products"
+import { TypeFilter } from "@modules/store/components/refinement-list/type-filter"
 
 type RefinementListProps = {
   title?: string
@@ -73,9 +75,9 @@ const RefinementList = ({
   )
 
   return (
-    <Layout className="mb-4 md:mb-6">
+    <Layout className="mb-6 md:mb-8">
       <LayoutColumn>
-        <h2 className="text-lg md:text-2xl mb-6" id="products">
+        <h2 className="text-md md:text-2xl mb-6 md:mb-7" id="products">
           {title}
         </h2>
         <div className="flex justify-between gap-10">
@@ -89,7 +91,7 @@ const RefinementList = ({
             setMultipleQueryParams={setMultipleQueryParams}
           />
           <MobileSort sortBy={sortBy} setQueryParams={setQueryParams} />
-          <div className="flex justify-between gap-6 max-md:hidden">
+          <div className="flex justify-between gap-4 max-md:hidden">
             {typeof collections !== "undefined" && (
               <CollectionFilter
                 collections={collections}

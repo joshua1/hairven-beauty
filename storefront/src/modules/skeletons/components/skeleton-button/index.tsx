@@ -1,7 +1,4 @@
-// External components
 import { twMerge } from "tailwind-merge"
-
-// Components
 import { Skeleton } from "@/components/ui/Skeleton"
 
 const SkeletonButton: React.FC<{ className?: string }> = ({ className }) => {

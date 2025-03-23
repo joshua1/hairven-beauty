@@ -1,11 +1,15 @@
-// External components
+import { Metadata } from "next"
 import Image from "next/image"
 import { StoreRegion } from "@medusajs/types"
-
 import { listRegions } from "@lib/data/regions"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
 import { CollectionsSection } from "@/components/CollectionsSection"
+
+export const metadata: Metadata = {
+  title: "Inspiration",
+  description: "Get inspired by our latest collections",
+}
 
 export async function generateStaticParams() {
   const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
@@ -33,17 +37,17 @@ export default function InspirationPage() {
     <>
       <div className="max-md:pt-18">
         <Image
-          src="/images/content/living-room9.png"
+          src="/images/content/living-room-dark-green-three-seater-sofa.png"
           width={2880}
           height={1500}
-          alt="Living room"
+          alt="Living room with dark green three-seater sofa"
           className="md:h-screen md:object-cover mb-8 md:mb-26"
         />
       </div>
       <div className="pb-26 md:pb-36">
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
-            <h3 className="text-lg mb-6 md:mb-16 md:text-2xl">
+            <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
               The Astrid Curve sofa is a masterpiece of minimalism and luxury.
             </h3>
             <div className="md:text-md max-md:mb-16 max-w-135">
@@ -57,10 +61,10 @@ export default function InspirationPage() {
           <LayoutColumn start={{ base: 1, md: 9 }} end={13}>
             <LocalizedLink href="/products/astrid-curve">
               <Image
-                src="/images/content/shop6.png"
+                src="/images/content/dark-gray-three-seater-sofa.png"
                 width={768}
                 height={572}
-                alt="Sofa"
+                alt="Dark gray three-seater sofa"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
@@ -78,15 +82,15 @@ export default function InspirationPage() {
           </LayoutColumn>
           <LayoutColumn>
             <Image
-              src="/images/content/living-room10.png"
+              src="/images/content/living-room-brown-armchair-gray-corner-sofa.png"
               width={2496}
               height={1404}
-              alt="Sofa"
+              alt="Living room with brown armchair and gray corner sofa"
               className="mt-26 md:mt-36 mb-8 md:mb-26"
             />
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
-            <h3 className="text-lg mb-6 md:mb-16 md:text-2xl">
+            <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
               Haven Sofas have minimalistic designs, neutral colors, and
               high-quality textures.
             </h3>
@@ -104,10 +108,10 @@ export default function InspirationPage() {
               className="mb-8 md:mb-16 inline-block"
             >
               <Image
-                src="/images/content/shop1.png"
+                src="/images/content/gray-three-seater-sofa.png"
                 width={768}
                 height={572}
-                alt="Sofa"
+                alt="Gray three-seater sofa"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
@@ -124,10 +128,10 @@ export default function InspirationPage() {
             </LocalizedLink>
             <LocalizedLink href="/products/nordic-breeze">
               <Image
-                src="/images/content/shop3.png"
+                src="/images/content/gray-arm-chair.png"
                 width={768}
                 height={572}
-                alt="Sofa"
+                alt="Gray arm chair"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
@@ -145,15 +149,15 @@ export default function InspirationPage() {
           </LayoutColumn>
         </Layout>
         <Image
-          src="/images/content/living-room4.png"
+          src="/images/content/living-room-gray-two-seater-puffy-sofa.png"
           width={2880}
           height={1618}
-          alt="Living room"
+          alt="Living room with gray two-seater puffy sofa"
           className="md:h-screen md:object-cover mt-26 md:mt-36 mb-8 md:mb-26"
         />
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
-            <h3 className="text-lg mb-6 md:mb-16 md:text-2xl">
+            <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
               Oslo Drift is infused with playful textures and vibrant patterns
               with eclectic vibes.
             </h3>
@@ -168,10 +172,10 @@ export default function InspirationPage() {
           <LayoutColumn start={{ base: 1, md: 9 }} end={13}>
             <LocalizedLink href="/products/oslo-drift">
               <Image
-                src="/images/content/shop12.png"
+                src="/images/content/white-two-seater-sofa.png"
                 width={768}
                 height={572}
-                alt="Sofa"
+                alt="White two-seater sofa"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">

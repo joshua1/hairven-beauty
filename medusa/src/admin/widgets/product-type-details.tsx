@@ -106,7 +106,7 @@ const ProductTypeDetailsWidget = ({
             <Button
               variant="transparent"
               size="small"
-              className="text-ui-fg-muted hover:text-ui-fg-subtle"
+              className="text-fg-muted dark:text-fg-muted-dark hover:text-fg-subtle dark:hover:text-fg-subtle-dark"
               onClick={(event) => {
                 event.preventDefault();
                 setIsModalOpen(true);
@@ -117,7 +117,7 @@ const ProductTypeDetailsWidget = ({
           </UpdateDetailsDrawer>
         )}
       </div>
-      <div className="text-ui-fg-subtle grid grid-cols-2 items-center px-6 py-4">
+      <div className="text-fg-subtle dark:text-fg-subtle-dark grid grid-cols-2 items-center px-6 py-4">
         {details === null ? (
           <Text>Loading...</Text>
         ) : (

@@ -1,10 +1,5 @@
-// External
 import { Metadata } from "next"
-
-// Lib
 import { getBaseURL } from "@lib/util/env"
-
-// Components
 import { Header } from "@/components/Header"
 import { Footer } from "@/components/Footer"
 

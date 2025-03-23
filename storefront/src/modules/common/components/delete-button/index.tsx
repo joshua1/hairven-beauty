@@ -9,7 +9,7 @@ const DeleteButton = ({ id }: { id: string }) => {
 
   const handleDelete = async (id: string) => {
     setIsDeleting(true)
-    await deleteLineItem(id).catch((err) => {
+    await deleteLineItem(id).catch(() => {
       setIsDeleting(false)
     })
   }
@@ -19,8 +19,10 @@ const DeleteButton = ({ id }: { id: string }) => {
       type="button"
       onClick={() => handleDelete(id)}
       disabled={isDeleting}
+      className="p-1"
+      aria-label="Delete"
     >
-      <Icon name="trash" className="w-6 h-6" />
+      <Icon name="trash" className="w-4 h-4 sm:w-6 sm:h-6" />
     </button>
   )
 }

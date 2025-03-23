@@ -1,4 +1,3 @@
-// External packages
 import * as React from "react"
 import { twJoin, twMerge } from "tailwind-merge"
 
@@ -10,7 +9,7 @@ export const Layout = React.forwardRef<
     {...rest}
     ref={ref}
     className={twMerge(
-      "mx-auto grid grid-cols-12 gap-x-4 md:gap-x-12 px-4 container",
+      "mx-auto grid grid-cols-12 gap-x-4 md:gap-x-12 px-4 sm:container",
       className
     )}
   />
@@ -20,6 +19,7 @@ Layout.displayName = "Layout"
 
 // const fullConfig = resolveConfig(tailwindConfig);
 // const breakpointsNamesArray = Object.keys(fullConfig.theme.screens);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const breakpointsNamesArray = ["base", "xs", "sm", "md", "lg", "xl"] as const
 
 type BreakpointsNames = (typeof breakpointsNamesArray)[number]

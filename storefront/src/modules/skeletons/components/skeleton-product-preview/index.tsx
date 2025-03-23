@@ -1,4 +1,3 @@
-// Components
 import { Skeleton } from "@/components/ui/Skeleton"
 
 const SkeletonProductPreview = () => {

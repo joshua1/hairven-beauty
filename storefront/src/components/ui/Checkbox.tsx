@@ -1,15 +1,14 @@
-// External packages
-import { Checkbox, CheckboxProps } from "react-aria-components"
-import { twMerge } from "tailwind-merge"
+"use client"
 
-// Components
+import * as ReactAria from "react-aria-components"
+import { twMerge } from "tailwind-merge"
 import { Icon, IconNames, IconProps } from "@/components/Icon"
 
-export const UiCheckbox: React.FC<CheckboxProps> = ({
+export const UiCheckbox: React.FC<ReactAria.CheckboxProps> = ({
   className,
   ...props
 }) => (
-  <Checkbox
+  <ReactAria.Checkbox
     {...props}
     className={twMerge(
       "flex gap-2 group cursor-pointer items-center",
@@ -25,7 +24,7 @@ export const UiCheckboxBox: React.FC<React.ComponentPropsWithoutRef<"div">> = ({
   <div
     {...props}
     className={twMerge(
-      "border border-grayscale-200 w-4 h-4 flex items-center justify-center group-data-[selected=true]:bg-black group-data-[selected=true]:border-black",
+      "border border-grayscale-200 w-4 h-4 flex items-center group-hover:border-grayscale-600 justify-center group-data-[selected=true]:bg-black group-data-[selected=true]:border-black group-hover:group-data-[selected=true]:border-grayscale-600 group-hover:group-data-[selected=true]:bg-grayscale-600 transition-colors",
       className
     )}
   />
@@ -46,9 +45,4 @@ export const UiCheckboxIcon: React.FC<
 
 export const UiCheckboxLabel: React.FC<
   React.ComponentPropsWithoutRef<"span">
-> = ({ className, ...props }) => (
-  <span
-    {...props}
-    className={twMerge("group-data-[selected=true]:font-semibold", className)}
-  />
-)
+> = ({ className, ...props }) => <span {...props} className={className} />

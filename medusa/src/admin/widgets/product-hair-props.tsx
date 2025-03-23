@@ -202,7 +202,7 @@ const ProductHairPropsWidget = withQueryClient(
           <Heading>Product Lengths &amp; Cap Sizes</Heading>
           <IconButton
             variant="transparent"
-            className="text-ui-fg-muted hover:text-ui-fg-subtle"
+            className="text-fg-muted dark:text-fg-muted-dark hover:text-fg-subtle dark:hover:text-fg-subtle-dark"
             onClick={(event) => {
               event.preventDefault()
               productHairProps.refetch()

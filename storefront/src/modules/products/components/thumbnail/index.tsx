@@ -1,7 +1,7 @@
 import * as React from "react"
 import Image from "next/image"
-import { clx } from "@medusajs/ui"
-import { HttpTypes } from "@medusajs/types"
+import type { HttpTypes } from "@medusajs/types"
+import { twMerge } from "tailwind-merge"
 
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
 
@@ -26,16 +26,18 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
 
   return (
     <div
-      className={clx("relative w-full overflow-hidden", className, {
-        "aspect-[11/14]": isFeatured,
-        "aspect-[9/16]": !isFeatured && size !== "square" && size !== "3/4",
-        "aspect-[1/1]": size === "square",
-        "aspect-[3/4]": size === "3/4",
-        "w-[180px]": size === "small",
-        "w-[290px]": size === "medium",
-        "w-[440px]": size === "large",
-        "w-full": size === "full",
-      })}
+      className={twMerge(
+        "relative w-full overflow-hidden",
+        className,
+        isFeatured && "aspect-[11/14]",
+        !isFeatured && size !== "square" && size !== "3/4" && "aspect-[9/16]",
+        size === "square" && "aspect-[1/1]",
+        size === "3/4" && "aspect-[3/4]",
+        size === "small" && "w-[180px]",
+        size === "medium" && "w-[290px]",
+        size === "large" && "w-[440px]",
+        size === "full" && "w-full"
+      )}
       data-testid={dataTestid}
     >
       <ImageOrPlaceholder image={initialImage} size={size} />

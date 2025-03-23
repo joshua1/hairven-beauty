@@ -20,7 +20,8 @@ export default function ProductPrice({
   }
 
   const hasReducedPrice =
-    selectedPrice.calculated_price_number < selectedPrice.original_price_number
+    selectedPrice.calculated_price_number <
+    (selectedPrice.original_price_number ?? 0)
 
   if (hasReducedPrice && variant) {
     return (

@@ -9,8 +9,8 @@ type ItemsTemplateProps = {
 const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
   return (
     <div>
-      <div className="lg:h-22 pb-12 lg:pb-0 border-b border-b-grayscale-100">
-        <h1 className="md:text-2xl text-lg leading-none">Your shopping cart</h1>
+      <div className="pb-8 md:pb-12 border-b border-b-grayscale-100">
+        <h1 className="md:text-2xl text-md leading-none">Your shopping cart</h1>
       </div>
       <div>
         {items

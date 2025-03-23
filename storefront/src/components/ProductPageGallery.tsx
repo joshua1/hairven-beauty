@@ -2,13 +2,10 @@
 
 "use client"
 
-// External packages
 import * as React from "react"
 import { twJoin, twMerge } from "tailwind-merge"
 import { EmblaCarouselType } from "embla-carousel"
 import useEmblaCarousel from "embla-carousel-react"
-
-// Components
 import { Icon } from "@/components/Icon"
 import { IconCircle } from "@/components/IconCircle"
 
@@ -66,6 +63,7 @@ export const ProductPageGallery: React.FC<
           onClick={scrollPrev}
           disabled={prevBtnDisabled}
           className="transition-opacity absolute left-4 z-10 max-lg:hidden"
+          aria-label="Previous"
         >
           <IconCircle
             className={twJoin(
@@ -92,6 +90,7 @@ export const ProductPageGallery: React.FC<
           onClick={scrollNext}
           disabled={nextBtnDisabled}
           className="transition-opacity absolute right-4 z-10 max-lg:hidden"
+          aria-label="Next"
         >
           <IconCircle
             className={twJoin(
@@ -112,7 +111,7 @@ export const ProductPageGallery: React.FC<
           >
             <span
               className={twMerge(
-                "border-b border-transparent transition-colors pb-0.5 px-0.5",
+                "border-b border-transparent transition-colors px-0.5",
                 index === selectedIndex && "border-black"
               )}
             >

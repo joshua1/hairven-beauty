@@ -1,12 +1,13 @@
-// External components
+import { Metadata } from "next"
 import Image from "next/image"
 import { StoreRegion } from "@medusajs/types"
-
-// Lib
 import { listRegions } from "@lib/data/regions"
-
-// Components
 import { Layout, LayoutColumn } from "@/components/Layout"
+
+export const metadata: Metadata = {
+  title: "About",
+  description: "Learn more about Sofa Society",
+}
 
 export async function generateStaticParams() {
   const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
@@ -34,24 +35,24 @@ export default function AboutPage() {
     <>
       <div className="max-md:pt-18">
         <Image
-          src="/images/content/living-room5.png"
+          src="/images/content/living-room-gray-three-seater-sofa.png"
           width={2880}
           height={1500}
-          alt="Living room"
+          alt="Living room with gray three-seater sofa"
           className="md:h-screen md:object-cover"
         />
       </div>
       <div className="pt-8 md:pt-26 pb-26 md:pb-36">
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, lg: 7 }}>
-            <h3 className="text-lg max-lg:mb-6 md:text-2xl">
+            <h3 className="text-md max-lg:mb-6 md:text-2xl">
               At Sofa Society, we believe that a sofa is the heart of every
               home.
             </h3>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="md:text-md lg:mt-18">
-              <p className="mb-6 lg:mb-8">
+              <p className="mb-5 lg:mb-9">
                 Welcome to Sofa Society, where we believe that comfort and style
                 should be effortlessly intertwined. Our mission is to help you
                 create beautiful, functional spaces that bring warmth and
@@ -66,22 +67,22 @@ export default function AboutPage() {
           </LayoutColumn>
           <LayoutColumn>
             <Image
-              src="/images/content/living-room6.png"
+              src="/images/content/living-room-black-armchair-dark-gray-sofa.png"
               width={2496}
               height={1404}
-              alt="Living room"
+              alt="Living room with black armchair and dark gray sofa"
               className="mt-26 lg:mt-36 mb-8 lg:mb-26"
             />
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, lg: 8 }}>
-            <h3 className="text-lg lg:mb-10 mb-6 md:text-2xl">
+            <h3 className="text-md lg:mb-10 mb-6 md:text-2xl">
               We are here to make your living space a true reflection of your
               personal style.
             </h3>
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, lg: 6 }}>
-            <div className="mb-16 lg:mb-36">
-              <p className="mb-6">
+            <div className="mb-16 lg:mb-26">
+              <p className="mb-5 md:mb-9">
                 At the heart of our brand is a deep commitment to quality. We
                 understand that a sofa isn&apos;t just another piece of
                 furniture; it&apos;s where you unwind, gather with loved ones,
@@ -100,11 +101,11 @@ export default function AboutPage() {
           </LayoutColumn>
           <LayoutColumn start={{ base: 2, lg: 1 }} end={{ base: 12, lg: 7 }}>
             <Image
-              src="/images/content/living-room7.png"
+              src="/images/content/gray-one-seater-sofa-wooden-coffee-table.png"
               width={1200}
               height={1600}
-              alt="Living room"
-              className="mb-16 lg:mb-36"
+              alt="Gray one-seater sofa and wooden coffee table"
+              className="mb-16 lg:mb-46"
             />
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
@@ -133,21 +134,21 @@ export default function AboutPage() {
           </LayoutColumn>
         </Layout>
         <Image
-          src="/images/content/living-room8.png"
+          src="/images/content/living-room-gray-three-seater-puffy-sofa.png"
           width={2880}
           height={1618}
-          alt="Living room"
+          alt="Living room with gray three-seater puffy sofa"
           className="mb-8 lg:mb-26"
         />
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, lg: 7 }}>
-            <h3 className="text-lg max-lg:mb-8 md:text-2xl">
+            <h3 className="text-md max-lg:mb-6 md:text-2xl">
               Our customers are at the center of everything we do!
             </h3>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="md:text-md lg:mt-18">
-              <p className="mb-6 lg:mb-8">
+              <p className="mb-5 lg:mb-9">
                 Our team is here to help guide you through the process, offering
                 personalised support to ensure that you find exactly what
                 you&apos;re looking for.

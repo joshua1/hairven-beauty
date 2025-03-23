@@ -1,4 +1,3 @@
-// External packages
 import * as React from "react"
 
 export const User: React.FC<React.ComponentPropsWithoutRef<"svg">> = (

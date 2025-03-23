@@ -1,5 +1,4 @@
 import Image from "next/image"
-
 import { getCollectionsList } from "@lib/data/collections"
 import { Carousel } from "@/components/Carousel"
 import { LocalizedButtonLink, LocalizedLink } from "@/components/LocalizedLink"
@@ -20,7 +19,7 @@ export const CollectionsSection: React.FC<{ className?: string }> = async ({
 
   return (
     <Carousel
-      heading={<h3 className="text-lg md:text-2xl">Collections</h3>}
+      heading={<h3 className="text-md md:text-2xl">Collections</h3>}
       button={
         <>
           <LocalizedButtonLink

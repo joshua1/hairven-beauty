@@ -7,13 +7,7 @@ import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Icon } from "@/components/Icon"
 import { convertToLocale } from "@lib/util/money"
 
-const MobileCheckoutSummary = ({
-  cart,
-}: {
-  cart: HttpTypes.StoreCart & {
-    promotions: HttpTypes.StorePromotion[]
-  }
-}) => {
+const MobileCheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
   const { currency_code, total } = cart
   const wrapperRef = React.useRef<HTMLDivElement>(null)
   const onClickHandler = React.useCallback<
@@ -64,7 +58,7 @@ const MobileCheckoutSummary = ({
           height: "0px",
         }}
       >
-        <div className="pt-4 pb-8">
+        <div className="py-8">
           <CheckoutSummary cart={cart} />
         </div>
       </div>

@@ -1,43 +1,103 @@
 "use client"
 
-import { useActionState } from "react"
-import { useToggleState } from "@medusajs/ui"
+import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { twJoin } from "tailwind-merge"
 import { HttpTypes } from "@medusajs/types"
-
 import { setAddresses } from "@lib/data/cart"
 import compareAddresses from "@lib/util/compare-addresses"
+import { SubmitButton } from "@modules/common/components/submit-button"
+import BillingAddress from "@modules/checkout/components/billing_address"
+import ErrorMessage from "@modules/checkout/components/error-message"
+import ShippingAddress from "@modules/checkout/components/shipping-address"
 import { Button } from "@/components/Button"
-import BillingAddress from "../billing_address"
-import ErrorMessage from "../error-message"
-import ShippingAddress from "../shipping-address"
-import { SubmitButton } from "../submit-button"
+import { Form } from "@/components/Forms"
+import { z } from "zod"
+import { useCustomer } from "hooks/customer"
+import { withReactQueryProvider } from "@lib/util/react-query"
 
-const Addresses = ({
-  cart,
-  customer,
-}: {
-  cart: HttpTypes.StoreCart | null
-  customer: HttpTypes.StoreCustomer | null
-}) => {
+const addressesFormSchema = z
+  .object({
+    shipping_address: z.object({
+      first_name: z.string().min(1),
+      last_name: z.string().min(1),
+      company: z.string().optional(),
+      address_1: z.string().min(1),
+      address_2: z.string().optional(),
+      city: z.string().min(1),
+      postal_code: z.string().min(1),
+      province: z.string().optional(),
+      country_code: z.string().min(2),
+      phone: z.string().optional(),
+    }),
+  })
+  .and(
+    z.discriminatedUnion("same_as_billing", [
+      z.object({
+        same_as_billing: z.literal("on"),
+      }),
+      z.object({
+        same_as_billing: z.literal("off").optional(),
+        billing_address: z.object({
+          first_name: z.string().min(1),
+          last_name: z.string().min(1),
+          company: z.string().optional(),
+          address_1: z.string().min(1),
+          address_2: z.string().optional(),
+          city: z.string().min(1),
+          postal_code: z.string().min(1),
+          province: z.string().optional(),
+          country_code: z.string().min(2),
+          phone: z.string().optional(),
+        }),
+      }),
+    ])
+  )
+
+const Addresses = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
 
   const isOpen = searchParams.get("step") === "delivery"
 
-  const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
-    cart?.shipping_address && cart?.billing_address
-      ? compareAddresses(cart?.shipping_address, cart?.billing_address)
-      : true
+  const [sameAsBilling, setSameAsBilling] = React.useState(true)
+
+  const { data: customer } = useCustomer()
+
+  React.useEffect(() => {
+    if (cart?.shipping_address && cart?.billing_address) {
+      setSameAsBilling(
+        compareAddresses(cart.shipping_address, cart.billing_address)
+      )
+    }
+  }, [cart?.billing_address, cart?.shipping_address])
+
+  const toggleSameAsBilling = React.useCallback(() => {
+    setSameAsBilling((prev) => !prev)
+  }, [setSameAsBilling])
+
+  const [state, formAction, isPending] = React.useActionState(
+    setAddresses,
+    null
   )
 
-  const [message, formAction] = useActionState(setAddresses, null)
+  const onSubmit = (values: z.infer<typeof addressesFormSchema>) => {
+    React.startTransition(() => {
+      formAction(values)
+    })
+  }
+
+  React.useEffect(() => {
+    if (isOpen && state?.success) {
+      router.push(pathname + "?step=shipping", { scroll: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state])
 
   return (
     <>
-      <div className="flex justify-between mb-8 border-t border-grayscale-200 pt-8 mt-8">
+      <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
           <p
             className={twJoin(
@@ -60,24 +120,93 @@ const Addresses = ({
         )}
       </div>
       {isOpen ? (
-        // TODO: replace with react-hook-form and add validation
-        <form action={formAction}>
-          <ShippingAddress
-            customer={customer}
-            checked={sameAsBilling}
-            onChange={toggleSameAsBilling}
-            cart={cart}
-          />
+        <Form
+          schema={addressesFormSchema}
+          onSubmit={onSubmit}
+          formProps={{
+            id: `email`,
+          }}
+          defaultValues={
+            sameAsBilling
+              ? {
+                  shipping_address: cart?.shipping_address || {
+                    first_name: "",
+                    last_name: "",
+                    company: "",
+                    province: "",
+                    city: "",
+                    postal_code: "",
+                    country_code: "",
+                    address_1: "",
+                    address_2: "",
+                    phone: "",
+                  },
+                  same_as_billing: "on",
+                }
+              : {
+                  shipping_address: cart?.shipping_address || {
+                    first_name: "",
+                    last_name: "",
+                    company: "",
+                    province: "",
+                    city: "",
+                    postal_code: "",
+                    country_code: "",
+                    address_1: "",
+                    address_2: "",
+                    phone: "",
+                  },
+                  same_as_billing: "off",
+                  billing_address: cart?.billing_address || {
+                    first_name: "",
+                    last_name: "",
+                    company: "",
+                    province: "",
+                    city: "",
+                    postal_code: "",
+                    country_code: "",
+                    address_1: "",
+                    address_2: "",
+                    phone: "",
+                  },
+                }
+          }
+        >
+          {({ watch }) => {
+            const shippingData = watch("shipping_address")
+            const isDisabled =
+              !customer?.addresses?.length &&
+              !Object.values(shippingData).some((value) => value)
+            return (
+              <>
+                <ShippingAddress
+                  customer={customer || null}
+                  checked={sameAsBilling}
+                  onChange={toggleSameAsBilling}
+                  cart={cart}
+                />
 
-          {!sameAsBilling && <BillingAddress cart={cart} />}
-          <SubmitButton className="mt-6">Next</SubmitButton>
-          <ErrorMessage error={message} />
-        </form>
+                {!sameAsBilling && (
+                  <BillingAddress cart={cart} customer={customer || null} />
+                )}
+
+                <SubmitButton
+                  className="mt-8"
+                  isLoading={isPending}
+                  isDisabled={isDisabled}
+                >
+                  Next
+                </SubmitButton>
+                <ErrorMessage error={state?.error} />
+              </>
+            )
+          }}
+        </Form>
       ) : cart?.shipping_address ? (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-row gap-16">
+          <div className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-12">
             <div className="text-grayscale-500">Shipping address</div>
-            <div>
+            <div className="text-grayscale-600">
               {[
                 cart.shipping_address.first_name,
                 cart.shipping_address.last_name,
@@ -102,9 +231,9 @@ const Addresses = ({
             </div>
           </div>
           {sameAsBilling || cart.billing_address ? (
-            <div className="flex flex-row gap-16">
+            <div className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-17">
               <div className="text-grayscale-500">Billing address</div>
-              <div>
+              <div className="text-grayscale-600">
                 {sameAsBilling ? (
                   "Same as shipping address"
                 ) : (
@@ -142,4 +271,4 @@ const Addresses = ({
   )
 }
 
-export default Addresses
+export default withReactQueryProvider(Addresses)

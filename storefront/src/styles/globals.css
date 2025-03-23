@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    @apply text-black;
+    @apply text-black font-normal;
   }
 
   h1,
@@ -30,37 +30,6 @@
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
-  }
-
-  input:focus ~ label,
-  input:not(:placeholder-shown) ~ label {
-    @apply -translate-y-2 text-xsmall-regular;
-  }
-
-  input:focus ~ label {
-    @apply left-0;
-  }
-
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  textarea:-webkit-autofill,
-  textarea:-webkit-autofill:hover,
-  textarea:-webkit-autofill:focus,
-  select:-webkit-autofill,
-  select:-webkit-autofill:hover,
-  select:-webkit-autofill:focus {
-    border: 1px solid #212121;
-    -webkit-text-fill-color: #212121;
-    -webkit-box-shadow: 0 0 0px 1000px #fff inset;
-    transition: background-color 5000s ease-in-out 0s;
-  }
-
-  input[type="search"]::-webkit-search-decoration,
-  input[type="search"]::-webkit-search-cancel-button,
-  input[type="search"]::-webkit-search-results-button,
-  input[type="search"]::-webkit-search-results-decoration {
-    -webkit-appearance: none;
   }
 }
 
@@ -167,5 +136,13 @@
         @apply mt-5;
       }
     }
+  }
+
+  .txt-medium {
+    @apply text-[1.875rem] leading-[1.3125rem] font-normal font-inter;
+  }
+
+  .txt-xlarge-plus {
+    @apply text-[1.125rem] leading-[1.6875rem] font-medium font-inter;
   }
 }

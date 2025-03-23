@@ -30,14 +30,14 @@ This starter kit is an ideal solution for developers who need to set up a profes
 - **Next.js and Tailwind CSS**: Built with **Next.js** v15 app router and **Tailwind CSS**, the starter is highly performant, customizable, and easy to extend with additional features.
 
 ## Roadmap
-- [ ] **Figma Design Templates**: This will enable you to easily customize the design of the storefront to match your brand.
-- [ ] **Search**: Integration with Meilisearch for a powerful search experience.
+- [x] **Figma Design Templates**: This will enable you to easily customize the design of the storefront to match your brand.
+- [x] **Search**: Integration with Meilisearch for a powerful search experience.
 - [x] ~~**404 Page**: Custom 404 page for a better user experience.~~
-- [ ] **Account Management**: Allow customers to create accounts, view order history, and manage their personal information.
-- [ ] **Cart Drawer**: Cart drawer that slides in from the side where customers can view and edit their cart items.
-- [ ] **Email Templates**: Customizable email templates for order confirmation, shipping updates, and more.
-- [ ] **Infinite Scroll Pagination**: Improve the product discovery experience with infinite scroll pagination on store and collection pages.
-- [ ] **Resend Integration**: Integration with Resend for sending transactional emails.
+- [x] ~~**Account Management**: Allow customers to create accounts, view order history, and manage their personal information.~~
+- [x] **Cart Drawer**: Cart drawer that slides in from the side where customers can view and edit their cart items.
+- [x] **Email Templates**: Customizable email templates for order confirmation, shipping updates, and more.
+- [x] **Infinite Scroll Pagination**: Improve the product discovery experience with infinite scroll pagination on store and collection pages.
+- [x] **Resend Integration**: Integration with Resend for sending transactional emails.
 
 ## Screenshots
 

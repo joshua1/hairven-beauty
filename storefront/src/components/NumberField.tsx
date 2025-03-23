@@ -1,9 +1,7 @@
 "use client"
 
-// External packages
 import * as ReactAria from "react-aria-components"
 import { twJoin, twMerge } from "tailwind-merge"
-
 import { Icon } from "@/components/Icon"
 
 export const NumberField: React.FC<
@@ -30,7 +28,7 @@ export const NumberField: React.FC<
     </ReactAria.Button>
     <ReactAria.Input
       className={twJoin(
-        "text-center focus-within:outline-none w-7 leading-none",
+        "disabled:text-grayscale-200 disabled:bg-transparent text-center focus-within:outline-none w-7 leading-none",
         size === "sm" ? "text-xs" : "text-sm"
       )}
     />

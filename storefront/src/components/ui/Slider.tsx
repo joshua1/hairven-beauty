@@ -1,29 +1,21 @@
-// External packages
-import {
-  SliderOutput,
-  SliderOutputProps,
-  SliderThumb,
-  SliderThumbProps,
-  SliderTrack,
-  SliderTrackProps,
-} from "react-aria-components"
+import * as ReactAria from "react-aria-components"
 import { twMerge } from "tailwind-merge"
 
-export const UiSliderTrack: React.FC<SliderTrackProps> = ({
+export const UiSliderTrack: React.FC<ReactAria.SliderTrackProps> = ({
   className,
   ...props
 }) => (
-  <SliderTrack
+  <ReactAria.SliderTrack
     {...props}
     className={twMerge("h-px bg-black", className as string)}
   />
 )
 
-export const UiSliderThumb: React.FC<SliderThumbProps> = ({
+export const UiSliderThumb: React.FC<ReactAria.SliderThumbProps> = ({
   className,
   ...props
 }) => (
-  <SliderThumb
+  <ReactAria.SliderThumb
     {...props}
     className={twMerge(
       "w-4 h-4 border border-black bg-white rounded-full cursor-pointer",
@@ -32,11 +24,11 @@ export const UiSliderThumb: React.FC<SliderThumbProps> = ({
   />
 )
 
-export const UiSliderOutput: React.FC<SliderOutputProps> = ({
+export const UiSliderOutput: React.FC<ReactAria.SliderOutputProps> = ({
   className,
   ...props
 }) => (
-  <SliderOutput
+  <ReactAria.SliderOutput
     {...props}
     className={twMerge("flex justify-between mt-5", className as string)}
   />

@@ -1,4 +1,3 @@
-// Components
 import { Skeleton } from "@/components/ui/Skeleton"
 
 const SkeletonCartTotals = ({ header = true }) => {
@@ -19,13 +18,13 @@ const SkeletonCartTotals = ({ header = true }) => {
           <Skeleton className="w-25 h-6" />
         </div>
       </div>
-      <hr className="my-6" />
-      <div className="flex justify-between mb-12">
-        <Skeleton className="w-20 h-9" />
-        <Skeleton className="w-30 h-9" />
+      <hr className="my-6 text-grayscale-200" />
+      <div className="flex justify-between mb-11">
+        <Skeleton className="w-20 h-8" />
+        <Skeleton className="w-30 h-8" />
       </div>
       <div className="flex justify-between gap-2">
-        <Skeleton className="w-50 h-12" />
+        <Skeleton className="flex-1 lg:w-50 h-12" />
         <Skeleton className="w-22 h-12" />
       </div>
     </div>

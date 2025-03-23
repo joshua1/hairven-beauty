@@ -2,12 +2,11 @@
 
 import * as React from "react"
 import { LinkProps } from "next/link"
-import { Link, LinkOwnProps } from "./Link"
-import { ButtonLink, ButtonOwnProps } from "./Button"
-
 import { useCountryCode } from "hooks/country-code"
+import { Link, LinkOwnProps } from "@/components/Link"
+import { ButtonLink, ButtonOwnProps } from "@/components/Button"
 
-export const LocalizedLink = <RouteInferType extends any>({
+export const LocalizedLink = <RouteInferType,>({
   children,
   href,
   ...props
@@ -23,7 +22,7 @@ export const LocalizedLink = <RouteInferType extends any>({
   )
 }
 
-export const LocalizedButtonLink = <RouteInferType extends any>({
+export const LocalizedButtonLink = <RouteInferType,>({
   children,
   href,
   ...props
