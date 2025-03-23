@@ -43,9 +43,9 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const validatedData = capSizesUpdateBodySchema.parse(body)
 
-  const capSize = await hairPropsModuleService.updateCapSize({
+  const capSize = await hairPropsModuleService.updateCapSizes({
     ...validatedData,
-    id: req.params.colorId,
+    id: req.params.capSizeId,
   })
 
   res.status(200).json(capSize)
@@ -59,10 +59,10 @@ export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
     withDeleted: true,
   })
 
-  await hairPropsModuleService.softDeleteCapSize(req.params.colorId)
+  await hairPropsModuleService.softDeleteCapSizes(req.params.id)
 
   const capSize = await hairPropsModuleService.retrieveCapSize(
-    req.params.colorId,
+    req.params.capSizeId,
     {
       withDeleted: true,
     }

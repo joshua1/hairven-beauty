@@ -29,7 +29,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const validatedData = updateMaterialBodySchema.parse(body)
 
-  const productLength = await hairPropsModuleService.updateProductLength({
+  const productLength = await hairPropsModuleService.updateProductLengths({
     ...validatedData,
     id: req.params.id,
   })
@@ -41,7 +41,7 @@ export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
   const hairPropsModuleService: HairPropsModuleService =
     req.scope.resolve(HAIR_PROPS_MODULE)
 
-  await hairPropsModuleService.softDeleteProductLength(req.params.id)
+  await hairPropsModuleService.softDeleteProductLengths(req.params.id)
 
   const productLength = await hairPropsModuleService.retrieveProductLength(
     req.params.id,

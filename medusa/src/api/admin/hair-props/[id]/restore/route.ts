@@ -6,7 +6,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const hairPropsModuleService: HairPropsModuleService =
     req.scope.resolve(HAIR_PROPS_MODULE)
 
-  await hairPropsModuleService.restoreProductLength(req.params.id)
+  await hairPropsModuleService.restoreProductLengths(req.params.id)
 
   const productLength = await hairPropsModuleService.retrieveProductLength(
     req.params.id,

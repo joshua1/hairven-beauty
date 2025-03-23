@@ -10,10 +10,10 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     withDeleted: true,
   })
 
-  await hairPropsModuleService.restoreCapSize(req.params.colorId)
+  await hairPropsModuleService.restoreCapSizes(req.params.id)
 
   const capSize = await hairPropsModuleService.retrieveCapSize(
-    req.params.colorId,
+    req.params.capSizeId,
     {
       withDeleted: true,
     }

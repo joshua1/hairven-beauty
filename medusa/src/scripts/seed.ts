@@ -54,11 +54,7 @@ async function getImageFileContent(filename: string) {
   const path = require('path')
 
   // Use path.resolve to get an absolute path to the seed-images directory
-  const imagePath = path.resolve(
-    process.cwd(),
-    'src/scripts/seed-images',
-    filename
-  )
+  const imagePath = path.resolve(process.cwd(), 'src/scripts/media', filename)
 
   try {
     const data = await fs.readFile(imagePath)
@@ -423,28 +419,71 @@ export default async function seedDemoData({ container }: ExecArgs) {
           name: 'Hair Care',
           is_active: true,
         },
+        {
+          name: 'Bone Straight',
+          is_active: true,
+        },
       ],
     },
   })
 
-  const [sofasImage, armChairsImage] = await uploadFilesWorkflow(container)
+  const [
+    boneStraight1Image,
+    straightHair1Image,
+    curlyHair1Image,
+    wavyHair1Image,
+    hairCare1Image,
+    hairAccessories1Image,
+  ] = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
             access: 'public',
-            filename: 'sofas.png',
-            mimeType: 'image/png',
-            content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/product-types/sofas/image.png'
+            filename: 'bone-straight-1.jpg',
+            mimeType: 'image/jpg',
+            content: await getImageFileContent(
+              '/media/product-types/bone-straight/bone-straight-1.jpg'
             ),
           },
           {
             access: 'public',
-            filename: 'arm-chairs.png',
+            filename: 'straight-hair-1.jpg',
+            mimeType: 'image/jpg',
+            content: await getImageFileContent(
+              '/media/product-types/straight/straight-hair-1.jpg'
+            ),
+          },
+          {
+            access: 'public',
+            filename: 'curly-hair-1.jpg',
+            mimeType: 'image/jpg',
+            content: await getImageFileContent(
+              '/media/product-types/curly/curly-hair-1.jpg'
+            ),
+          },
+          {
+            access: 'public',
+            filename: 'wavy-hair-1.jpg',
+            mimeType: 'image/jpg',
+            content: await getImageFileContent(
+              '/media/product-types/wavy/wavy-hair-1.jpg'
+            ),
+          },
+          {
+            access: 'public',
+            filename: 'hair-care-1.png',
             mimeType: 'image/png',
-            content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/product-types/arm-chairs/image.png'
+            content: await getImageFileContent(
+              '/media/product-types/care/hair-care-1.png'
+            ),
+          },
+          {
+            access: 'public',
+            filename: 'hair-accessories-1.png',
+            mimeType: 'image/png',
+            content: await getImageFileContent(
+              '/media/product-types/accessories/hair-accessories-1.png'
             ),
           },
         ],
@@ -458,15 +497,39 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       product_types: [
         {
-          value: 'Sofas',
+          value: 'Bone Straight',
           metadata: {
-            image: sofasImage,
+            image: boneStraight1Image,
           },
         },
         {
-          value: 'Arm Chairs',
+          value: 'Straight Hair',
           metadata: {
-            image: armChairsImage,
+            image: straightHair1Image,
+          },
+        },
+        {
+          value: 'Curly Hair',
+          metadata: {
+            image: curlyHair1Image,
+          },
+        },
+        {
+          value: 'Wavy Hair',
+          metadata: {
+            image: wavyHair1Image,
+          },
+        },
+        {
+          value: 'Hair Care',
+          metadata: {
+            image: hairCare1Image,
+          },
+        },
+        {
+          value: 'Hair Accessories',
+          metadata: {
+            image: hairAccessories1Image,
           },
         },
       ],
@@ -474,188 +537,188 @@ export default async function seedDemoData({ container }: ExecArgs) {
   })
 
   const [
-    scandinavianSimplicityImage,
-    scandinavianSimplicityCollectionPageImage,
-    scandinavianSimplicityProductPageImage,
-    scandinavianSimplicityProductPageWideImage,
-    scandinavianSimplicityProductPageCtaImage,
-    modernLuxeImage,
-    modernLuxeCollectionPageImage,
-    modernLuxeProductPageImage,
-    modernLuxeProductPageWideImage,
-    modernLuxeProductPageCtaImage,
-    bohoChicImage,
-    bohoChicCollectionPageImage,
-    bohoChicProductPageImage,
-    bohoChicProductPageWideImage,
-    bohoChicProductPageCtaImage,
-    timelessClassicsImage,
-    timelessClassicsCollectionPageImage,
-    timelessClassicsProductPageImage,
-    timelessClassicsProductPageWideImage,
-    timelessClassicsProductPageCtaImage,
+    rawDonorImage,
+    rawDonorCollectionPageImage,
+    rawDonorProductPageImage,
+    rawDonorProductPageWideImage,
+    rawDonorProductPageCtaImage,
+    pureDonorImage,
+    pureDonorCollectionPageImage,
+    pureDonorProductPageImage,
+    pureDonorProductPageWideImage,
+    pureDonorProductPageCtaImage,
+    babyDonorImage,
+    babyDonorCollectionPageImage,
+    babyDonorProductPageImage,
+    babyDonorProductPageWideImage,
+    babyDonorProductPageCtaImage,
+    theAugmentImage,
+    theAugmentCollectionPageImage,
+    theAugmentProductPageImage,
+    theAugmentProductPageWideImage,
+    theAugmentProductPageCtaImage,
   ] = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
             access: 'public',
-            filename: 'scandinavian-simplicity.png',
+            filename: 'raw-donor.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/image.png'
+              '/media/collections/raw-donor/image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'scandinavian-simplicity-collection-page-image.png',
+            filename: 'raw-donor-collection-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/collection_page_image.png'
+              '/media/collections/raw-donor/collection_page_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'scandinavian-simplicity-product-page-image.png',
+            filename: 'raw-donor-product-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_image.png'
+              '/media/collections/raw-donor/product_page_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'scandinavian-simplicity-product-page-wide-image.png',
+            filename: 'raw-donor-product-page-wide-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_wide_image.png'
+              '/media/collections/raw-donor/product_page_wide_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'scandinavian-simplicity-product-page-cta-image.png',
+            filename: 'raw-donor-product-page-cta-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_cta_image.png'
+              '/media/collections/raw-donor/product_page_cta_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'modern-luxe.png',
+            filename: 'pure-donor.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/image.png'
+              '/media/collections/pure-donor/image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'modern-luxe-collection-page-image.png',
+            filename: 'pure-donor-collection-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/collection_page_image.png'
+              '/media/collections/pure-donor/collection_page_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'modern-luxe-product-page-image.png',
+            filename: 'pure-donor-product-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_image.png'
+              '/media/collections/pure-donor/product_page_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'modern-luxe-product-page-wide-image.png',
+            filename: 'pure-donor-product-page-wide-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_wide_image.png'
+              '/media/collections/pure-donor/product_page_wide_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'modern-luxe-product-page-cta-image.png',
+            filename: 'pure-donor-product-page-cta-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_cta_image.png'
+              '/media/collections/pure-donor/product_page_cta_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'boho-chic.png',
+            filename: 'baby-donor.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/image.png'
+              '/media/collections/baby-donor/image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'boho-chic-collection-page-image.png',
+            filename: 'baby-donor-collection-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/collection_page_image.png'
+              '/media/collections/baby-donor/collection_page_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'boho-chic-product-page-image.png',
+            filename: 'baby-donor-product-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_image.png'
+              '/media/collections/baby-donor/product_page_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'boho-chic-product-page-wide-image.png',
+            filename: 'baby-donor-product-page-wide-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_wide_image.png'
+              '/media/collections/baby-donor/product_page_wide_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'boho-chic-product-page-cta-image.png',
+            filename: 'baby-donor-product-page-cta-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_cta_image.png'
+              '/media/collections/baby-donor/product_page_cta_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'timeless-classics.png',
+            filename: 'the-augment.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/image.png'
+              '/media/collections/the-augment/image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'timeless-classics-collection-page-image.png',
+            filename: 'the-augment-collection-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/collection_page_image.png'
+              '/media/collections/the-augment/collection_page_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'timeless-classics-product-page-image.png',
+            filename: 'the-augment-product-page-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_image.png'
+              '/media/collections/the-augment/product_page_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'timeless-classics-product-page-wide-image.png',
+            filename: 'the-augment-product-page-wide-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_wide_image.png'
+              '/media/collections/the-augment/product_page_wide_image.png'
             ),
           },
           {
             access: 'public',
-            filename: 'timeless-classics-product-page-cta-image.png',
+            filename: 'the-augment-product-page-cta-image.png',
             mimeType: 'image/png',
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_cta_image.png'
+              '/media/collections/the-augment/product_page_cta_image.png'
             ),
           },
         ],
@@ -669,93 +732,89 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       collections: [
         {
-          title: 'Scandinavian Simplicity',
-          handle: 'scandinavian-simplicity',
+          title: 'Raw Donor',
+          handle: 'raw-donor',
           metadata: {
             description:
               'Minimalistic designs, neutral colors, and high-quality textures',
-            image: scandinavianSimplicityImage,
-            collection_page_image: scandinavianSimplicityCollectionPageImage,
+            image: rawDonorImage,
+            collection_page_image: rawDonorCollectionPageImage,
             collection_page_heading:
-              'Scandinavian Simplicity: Effortless elegance, timeless comfort',
+              'Raw Donor: Effortless elegance, timeless comfort',
             collection_page_content: `Minimalistic designs, neutral colors, and high-quality textures. Perfect for those who seek comfort with a clean and understated aesthetic.
 
 This collection brings the essence of Scandinavian elegance to your living room.`,
             product_page_heading: 'Collection Inspired Interior',
-            product_page_image: scandinavianSimplicityProductPageImage,
-            product_page_wide_image: scandinavianSimplicityProductPageWideImage,
-            product_page_cta_image: scandinavianSimplicityProductPageCtaImage,
+            product_page_image: rawDonorProductPageImage,
+            product_page_wide_image: rawDonorProductPageWideImage,
+            product_page_cta_image: rawDonorProductPageCtaImage,
             product_page_cta_heading:
               "The 'Name of sofa' embodies Scandinavian minimalism with clean lines and a soft, neutral palette.",
-            product_page_cta_link:
-              'See more out of ‘Scandinavian Simplicity’ collection',
+            product_page_cta_link: 'See more out of ‘Raw Donor’ collection',
           },
         },
         {
-          title: 'Modern Luxe',
-          handle: 'modern-luxe',
+          title: 'Pure Donor',
+          handle: 'pure-donor',
           metadata: {
             description:
               'Sophisticated and sleek, these sofas blend modern design with luxurious comfort',
-            image: modernLuxeImage,
-            collection_page_image: modernLuxeCollectionPageImage,
+            image: pureDonorImage,
+            collection_page_image: pureDonorCollectionPageImage,
             collection_page_heading:
-              'Modern Luxe: Where modern design meets luxurious living',
+              'Pure Donor: Where modern design meets luxurious living',
             collection_page_content: `Sophisticated and sleek, these sofas blend modern design with luxurious comfort. Bold lines and premium materials create the ultimate statement pieces for any contemporary home.
 
 Elevate your space with timeless beauty.`,
             product_page_heading: 'Collection Inspired Interior',
-            product_page_image: modernLuxeProductPageImage,
-            product_page_wide_image: modernLuxeProductPageWideImage,
-            product_page_cta_image: modernLuxeProductPageCtaImage,
+            product_page_image: pureDonorProductPageImage,
+            product_page_wide_image: pureDonorProductPageWideImage,
+            product_page_cta_image: pureDonorProductPageCtaImage,
             product_page_cta_heading:
               "The 'Name of sofa' is a masterpiece of minimalism and luxury.",
-            product_page_cta_link: 'See more out of ‘Modern Luxe’ collection',
+            product_page_cta_link: 'See more out of ‘Pure Donor’ collection',
           },
         },
         {
-          title: 'Boho Chic',
-          handle: 'boho-chic',
+          title: 'Baby Donor',
+          handle: 'baby-donor',
           metadata: {
             description:
               'Infused with playful textures and vibrant patterns with eclectic vibes',
-            image: bohoChicImage,
-            collection_page_image: bohoChicCollectionPageImage,
+            image: babyDonorImage,
+            collection_page_image: babyDonorCollectionPageImage,
             collection_page_heading:
-              'Boho Chic: Relaxed, eclectic style with a touch of free-spirited charm',
+              'Baby Donor: Relaxed, eclectic style with a touch of free-spirited charm',
             collection_page_content: `Infused with playful textures and vibrant patterns, this collection embodies relaxed, eclectic vibes. Soft fabrics and creative designs add warmth and personality to any room.
 
 It’s comfort with a bold, carefree spirit.`,
             product_page_heading: 'Collection Inspired Interior',
-            product_page_image: bohoChicProductPageImage,
-            product_page_wide_image: bohoChicProductPageWideImage,
-            product_page_cta_image: bohoChicProductPageCtaImage,
+            product_page_image: babyDonorProductPageImage,
+            product_page_wide_image: babyDonorProductPageWideImage,
+            product_page_cta_image: babyDonorProductPageCtaImage,
             product_page_cta_heading:
               "The 'Name of sofa' captures the essence of boho style with its relaxed, oversized form and eclectic fabric choices.",
-            product_page_cta_link: 'See more out of ‘Boho Chic’ collection',
+            product_page_cta_link: 'See more out of ‘Baby Donor’ collection',
           },
         },
         {
-          title: 'Timeless Classics',
-          handle: 'timeless-classics',
+          title: 'The Augment',
+          handle: 'the-augment',
           metadata: {
             description:
-              'Elegant shapes and rich textures, traditional craftsmanship with modern comfort',
-            image: timelessClassicsImage,
-            collection_page_image: timelessClassicsCollectionPageImage,
+              'Augmented reality technology, interactive design, and unique features',
+            image: theAugmentImage,
+            collection_page_image: theAugmentCollectionPageImage,
             collection_page_heading:
-              'Timeless Classics: Enduring style, crafted for comfort and lasting beauty',
-            collection_page_content: `Designed for those who appreciate enduring style, this collection features elegant shapes and rich textures. These sofas combine traditional craftsmanship with modern comfort.
-
-Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
+              'The Augment: Where augmented reality meets interactive design',
+            collection_page_content: `Augmented reality technology, interactive design, and unique features. This collection brings the future of furniture design to life. It’s a space where technology meets creativity.`,
             product_page_heading: 'Collection Inspired Interior',
-            product_page_image: timelessClassicsProductPageImage,
-            product_page_wide_image: timelessClassicsProductPageWideImage,
-            product_page_cta_image: timelessClassicsProductPageCtaImage,
+            product_page_image: theAugmentProductPageImage,
+            product_page_wide_image: theAugmentProductPageWideImage,
+            product_page_cta_image: theAugmentProductPageCtaImage,
             product_page_cta_heading:
-              "The 'Name of sofa' brings a touch of traditional charm with its elegant curves and classic silhouette",
-            product_page_cta_link:
-              'See more out of ‘Timeless Classics’ collection',
+              "The 'Name of sofa' is a masterpiece of augmented reality technology.",
+            product_page_cta_link: 'See more out of ‘The Augment’ collection',
           },
         },
       ],

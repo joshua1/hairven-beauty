@@ -45,7 +45,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const validatedData = createProductLengthBodySchema.parse(body)
 
-  const productLength = await hairPropsModuleService.createProductLength(
+  const productLength = await hairPropsModuleService.createProductLengths(
     validatedData
   )
 

@@ -76,7 +76,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     productLengths: productLengths.map((productLength) => ({
       id: productLength.id,
       name: productLength.name,
-      cap_sizes: productLength.cap_sizes
+      cap_sizes: productLength.capSizes
         .filter((capSize) =>
           productLengthsAndCapSizesNamesTree
             .get(productLength.name)

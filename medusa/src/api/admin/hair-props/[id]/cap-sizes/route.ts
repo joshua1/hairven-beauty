@@ -47,7 +47,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const validatedData = capSizesCreateBodySchema.parse(body)
 
-  const capSize = await fashionModuleService.createCapSize({
+  const capSize = await fashionModuleService.createCapSizes({
     ...validatedData,
     product_length_id: req.params.id,
   })
